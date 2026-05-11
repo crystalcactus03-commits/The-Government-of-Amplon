@@ -1,0 +1,1487 @@
+python3 << 'PYEOF'
+import os
+
+logo_uri = open('/tmp/logo_uri.txt').read().strip()
+
+html = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Government of Amplon — Official Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --green:#1a3d2b;--green-light:#2a5c40;--green-dark:#112a1e;
+  --red:#C8102E;--red-dark:#9e0b22;--red-light:#fdeaed;
+  --yellow:#FFD100;--yellow-dark:#c9a500;--yellow-light:#fffbe6;
+  --white:#ffffff;--off:#F8F9FA;--gray-light:#F2F3F4;--gray:#E0E0E0;
+  --text:#1a1a1a;--text-muted:#5a6070;--text-light:#999;--border:#e0e0e0;
+  --success:#1a6e3a;--success-bg:#eaf6ef;
+  --font-serif:\'Playfair Display\',Georgia,serif;
+  --font-sans:\'Source Sans 3\',system-ui,sans-serif;
+  --r:6px;--rl:12px;--sh:0 2px 12px rgba(0,0,0,0.08);--shl:0 8px 32px rgba(0,0,0,0.14);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-sans);background:var(--white);color:var(--text);font-size:16px;line-height:1.6;overflow-x:hidden;}
+a{color:var(--green);text-decoration:none;}a:hover{color:var(--red);}
+button{font-family:var(--font-sans);}
+
+/* TRICOLOR */
+.tricolor{height:5px;background:linear-gradient(to right,var(--red) 33.33%,#fff 33.33% 66.66%,var(--yellow) 66.66%);border-bottom:1px solid var(--gray);}
+
+/* TOP STRIP */
+.top-strip{background:var(--green-dark);color:rgba(255,255,255,.8);font-size:12px;padding:6px 0;}
+.top-strip .inner{max-width:1280px;margin:0 auto;padding:0 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.top-strip a{color:rgba(255,255,255,.8);font-size:12px;}.top-strip a:hover{color:#fff;}
+.top-strip .links{display:flex;gap:16px;align-items:center;}
+.admin-btn-top{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:3px;cursor:pointer;transition:background .2s;text-transform:uppercase;letter-spacing:.06em;}
+.admin-btn-top:hover{background:rgba(255,255,255,.28);}
+.admin-btn-top.on{background:var(--yellow);color:var(--green-dark);}
+
+/* ADMIN BAR */
+#adminBar{display:none;background:var(--red-dark);padding:8px 0;border-bottom:3px solid var(--yellow);position:sticky;top:0;z-index:999;}
+body.admin #adminBar{display:block;}
+.ab-inner{max-width:1280px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.ab-inner span.lbl{color:#fff;font-size:12px;font-weight:700;letter-spacing:.05em;margin-right:4px;}
+.aab{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:12px;font-weight:600;padding:5px 12px;border-radius:var(--r);cursor:pointer;transition:background .2s;}
+.aab:hover{background:rgba(255,255,255,.28);}
+.aab.y{background:var(--yellow);color:var(--green-dark);border-color:var(--yellow);}
+.ab-hint{color:rgba(255,255,255,.5);font-size:11px;margin-left:auto;}
+
+/* HEADER */
+header{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;box-shadow:var(--sh);}
+.header-main{max-width:1280px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:16px;}
+.logo-img{height:64px;width:auto;flex-shrink:0;object-fit:contain;}
+.header-search{display:flex;margin-left:auto;}
+.header-search input{padding:8px 14px;border:1px solid var(--gray);border-right:none;font-size:13px;font-family:var(--font-sans);border-radius:var(--r) 0 0 var(--r);outline:none;width:200px;}
+.header-search input:focus{border-color:var(--green);}
+.header-search button{padding:8px 16px;background:var(--green);border:none;border-radius:0 var(--r) var(--r) 0;color:#fff;font-weight:600;cursor:pointer;font-size:13px;transition:background .2s;}
+.header-search button:hover{background:var(--green-light);}
+
+/* NAV */
+nav{background:var(--green);overflow-x:auto;}
+.nav-inner{max-width:1280px;margin:0 auto;padding:0 20px;display:flex;gap:0;}
+.nav-inner button{background:none;border:none;color:rgba(255,255,255,.85);font-size:13px;font-weight:500;padding:10px 14px;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;letter-spacing:.02em;}
+.nav-inner button:hover,.nav-inner button.active{color:#fff;border-bottom-color:var(--yellow);background:rgba(0,0,0,.12);}
+
+/* ALERT */
+.alert-bar{background:var(--yellow);padding:9px 0;font-size:13px;font-weight:500;border-bottom:2px solid var(--yellow-dark);}
+.alert-bar .inner{max-width:1280px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:12px;}
+.alert-badge{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;text-transform:uppercase;letter-spacing:.08em;flex-shrink:0;}
+.alert-bar a{color:var(--red-dark);font-weight:700;text-decoration:underline;}
+.alert-x{margin-left:auto;background:none;border:none;font-size:20px;cursor:pointer;color:var(--red-dark);opacity:.7;padding:0 4px;}
+
+/* PAGES */
+.page{display:none;}.page.active{display:block;}
+
+/* SHARED */
+.container{max-width:1280px;margin:0 auto;padding:0 20px;}
+.sec{padding:52px 0;}
+.sec-alt{background:var(--off);}
+.sec-label{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin-bottom:6px;display:block;}
+.sec-title{font-family:var(--font-serif);font-size:30px;font-weight:700;color:var(--green);margin-bottom:6px;line-height:1.2;}
+.sec-sub{font-size:15px;color:var(--text-muted);max-width:540px;margin-bottom:32px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--rl);padding:20px;box-shadow:var(--sh);}
+.card:hover{box-shadow:var(--shl);}
+
+/* BUTTONS */
+.btn{padding:10px 22px;border-radius:var(--r);font-weight:600;font-size:13px;cursor:pointer;border:2px solid transparent;transition:all .2s;display:inline-block;letter-spacing:.02em;}
+.btn-green{background:var(--green);color:#fff;border-color:var(--green);}.btn-green:hover{background:var(--green-light);color:#fff;}
+.btn-red{background:var(--red);color:#fff;border-color:var(--red);}.btn-red:hover{background:var(--red-dark);color:#fff;}
+.btn-yellow{background:var(--yellow);color:var(--green-dark);border-color:var(--yellow);}.btn-yellow:hover{background:#ffe740;color:var(--green-dark);}
+.btn-outline{background:transparent;border-color:var(--border);color:var(--text-muted);}.btn-outline:hover{border-color:var(--green);color:var(--green);}
+.btn-sm{padding:6px 14px;font-size:12px;font-weight:600;border-radius:var(--r);cursor:pointer;transition:all .2s;}
+.btn-sm-green{background:var(--green);color:#fff;border:none;}.btn-sm-green:hover{background:var(--green-light);}
+.btn-sm-red{background:var(--red);color:#fff;border:none;}.btn-sm-red:hover{background:var(--red-dark);}
+.btn-sm-out{background:transparent;border:1px solid var(--border);color:var(--text-muted);}.btn-sm-out:hover{border-color:var(--green);color:var(--green);}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:8px 18px;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;}.btn-ghost:hover{border-color:var(--green);color:var(--green);}
+.btn-sub{background:var(--green);color:#fff;border:none;padding:9px 24px;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;transition:background .2s;}.btn-sub:hover{background:var(--green-light);}
+
+/* ADMIN EDITABLE */
+body.admin .editable{outline:2px dashed var(--red);outline-offset:2px;border-radius:2px;cursor:text;}
+body.admin .editable:focus{outline:2px solid var(--green);background:#fffdf0;}
+.adm-add{display:none !important;}body.admin .adm-add{display:inline-flex !important;align-items:center;gap:4px;background:var(--yellow);color:var(--green-dark);border:none;border-radius:3px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.05em;margin-left:8px;vertical-align:middle;}
+.adm-del{display:none !important;}body.admin .adm-del{display:inline-flex !important;align-items:center;background:var(--red);color:#fff;border:none;border-radius:3px;padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer;position:absolute;top:8px;right:8px;}
+
+/* HERO */
+.hero{background:var(--green);background-image:radial-gradient(ellipse at 70% 50%,rgba(255,209,0,.12) 0%,transparent 60%);color:#fff;padding:60px 0;position:relative;overflow:hidden;}
+.hero::before{content:\'\';position:absolute;right:-60px;top:-60px;width:440px;height:440px;border-radius:50%;border:1px solid rgba(255,209,0,.15);}
+.hero-grid{display:grid;grid-template-columns:1fr 380px;gap:50px;align-items:center;position:relative;z-index:1;}
+.hero-eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--yellow);font-weight:600;margin-bottom:12px;}
+.hero h2{font-family:var(--font-serif);font-size:42px;font-weight:700;line-height:1.1;margin-bottom:16px;}
+.hero p{font-size:16px;color:rgba(255,255,255,.8);max-width:400px;line-height:1.7;margin-bottom:26px;}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap;}
+.hero-quick{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:var(--rl);padding:22px;}
+.hero-quick h3{font-family:var(--font-serif);font-size:16px;color:#fff;margin-bottom:12px;}
+.ql{display:flex;flex-direction:column;gap:7px;}
+.ql-btn{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);border-radius:var(--r);padding:10px 13px;color:rgba(255,255,255,.9);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;text-align:left;width:100%;}
+.ql-btn:hover{background:rgba(255,209,0,.2);border-color:rgba(255,209,0,.4);color:#fff;}
+.ql-icon{width:28px;height:28px;background:rgba(255,209,0,.2);border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+
+/* STATS */
+.stats-bar{background:var(--green-dark);padding:18px 0;}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;}
+.stat-item{text-align:center;padding:10px 16px;border-right:1px solid rgba(255,255,255,.08);}
+.stat-item:last-child{border-right:none;}
+.stat-num{font-family:var(--font-serif);font-size:28px;font-weight:700;color:var(--yellow);}
+.stat-lbl{font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
+
+/* ANN */
+.ann-grid{display:grid;grid-template-columns:2fr 1fr;gap:24px;}
+.ann-list{display:flex;flex-direction:column;gap:14px;}
+.ann-card{background:#fff;border:1px solid var(--border);border-radius:var(--rl);padding:20px;display:flex;gap:16px;align-items:flex-start;box-shadow:var(--sh);transition:all .2s;position:relative;}
+.ann-card:hover{box-shadow:var(--shl);transform:translateY(-2px);}
+.ann-card.featured{border-left:4px solid var(--yellow);}
+.ann-date{background:var(--green);color:#fff;border-radius:var(--r);text-align:center;padding:7px 10px;min-width:48px;flex-shrink:0;}
+.ann-date .mo{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.7);}
+.ann-date .dy{font-family:var(--font-serif);font-size:21px;font-weight:700;line-height:1;}
+.ann-body h4{font-family:var(--font-serif);font-size:15px;font-weight:600;color:var(--green);margin-bottom:4px;}
+.ann-body p{font-size:13px;color:var(--text-muted);line-height:1.6;}
+.ann-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:3px;margin-bottom:5px;}
+.t-notice{background:#e8f0fb;color:#1a3d7a;}.t-urgent{background:var(--red-light);color:var(--red);}.t-event{background:#eaf6ef;color:#1a6e3a;}.t-tender{background:var(--yellow-light);color:#7a4f00;}
+.ann-add-ph{border:2px dashed var(--green);border-radius:var(--rl);padding:18px;text-align:center;cursor:pointer;display:none;transition:background .2s;}
+body.admin .ann-add-ph{display:block;}
+.ann-add-ph:hover{background:var(--off);}
+.sb-card{background:#fff;border:1px solid var(--border);border-radius:var(--rl);padding:18px;box-shadow:var(--sh);margin-bottom:14px;}
+.sb-card h3{font-family:var(--font-serif);font-size:15px;font-weight:600;color:var(--green);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--gray);}
+.ev-item{padding:8px 0;border-bottom:1px solid var(--gray-light);display:flex;gap:9px;align-items:flex-start;}
+.ev-item:last-child{border-bottom:none;}
+.ev-dot{width:7px;height:7px;border-radius:50%;background:var(--red);margin-top:6px;flex-shrink:0;}
+.ev-item p{font-size:13px;color:var(--text);font-weight:500;line-height:1.4;}
+.ev-item span{font-size:11px;color:var(--text-muted);}
+
+/* FORMS */
+.fc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;}
+.fc{background:#fff;border:1px solid var(--border);border-radius:var(--rl);padding:20px;cursor:pointer;transition:all .2s;box-shadow:var(--sh);position:relative;overflow:hidden;}
+.fc::before{content:\'\';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gray);transition:background .2s;}
+.fc:hover{box-shadow:var(--shl);transform:translateY(-2px);}
+.fc:hover::before{background:var(--green);}
+.fc-icon{width:40px;height:40px;background:var(--gray-light);border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px;}
+.fc h4{font-family:var(--font-serif);font-size:14px;font-weight:600;color:var(--green);margin-bottom:4px;}
+.fc p{font-size:12px;color:var(--text-muted);line-height:1.5;}
+.fc-meta{margin-top:10px;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text-muted);}
+.fc-time{font-weight:600;color:var(--red);}
+
+/* ELECTIONS */
+.el-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.el-card{background:#fff;border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:var(--sh);}
+.el-hdr{background:var(--green);padding:16px 20px;position:relative;}
+.el-type{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--yellow);font-weight:600;margin-bottom:4px;}
+.el-hdr h3{font-family:var(--font-serif);font-size:18px;color:#fff;font-weight:700;}
+.el-cd{position:absolute;top:16px;right:20px;background:rgba(255,255,255,.12);border-radius:var(--r);padding:6px 12px;text-align:center;}
+.el-cd .num{font-family:var(--font-serif);font-size:20px;font-weight:700;color:var(--yellow);}
+.el-cd .lbl{font-size:9px;color:rgba(255,255,255,.6);text-transform:uppercase;}
+.el-body{padding:16px 20px;}
+.el-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.el-info label{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-light);font-weight:600;display:block;margin-bottom:1px;}
+.el-info span{font-size:13px;font-weight:600;color:var(--text);}
+.voter-banner{background:linear-gradient(135deg,var(--yellow),#ffe033);border-radius:var(--rl);padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:16px;}
+.voter-banner .icon{font-size:32px;flex-shrink:0;}
+.voter-banner h3{font-family:var(--font-serif);font-size:19px;font-weight:700;color:var(--green-dark);}
+.voter-banner p{font-size:13px;color:rgba(26,61,43,.8);margin-top:3px;}
+.voter-banner .vr-btn{margin-left:auto;flex-shrink:0;background:var(--red);color:#fff;border:none;padding:9px 18px;border-radius:var(--r);font-weight:600;font-size:12px;cursor:pointer;}
+
+/* DEPT */
+.dept-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.dept-card{background:#fff;border:1px solid var(--border);border-radius:var(--rl);padding:20px 16px;text-align:center;cursor:pointer;transition:all .2s;box-shadow:var(--sh);position:relative;}
+.dept-card:hover{box-shadow:var(--shl);transform:translateY(-3px);border-color:var(--green);}
+.dept-icon{width:50px;height:50px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.dept-card h4{font-family:var(--font-serif);font-size:13px;font-weight:600;color:var(--green);margin-bottom:4px;}
+.dept-card p{font-size:11px;color:var(--text-muted);line-height:1.5;margin-bottom:10px;}
+.dept-view{font-size:12px;color:var(--red);font-weight:600;}
+
+/* DEPT PANEL */
+.dept-panel{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:800;align-items:flex-start;justify-content:flex-end;}
+.dept-panel.open{display:flex;}
+.dept-panel-inner{background:#fff;width:min(640px,100%);height:100vh;overflow-y:auto;box-shadow:-8px 0 40px rgba(0,0,0,.2);}
+.dp-header{background:var(--green);padding:22px 24px;display:flex;align-items:flex-start;justify-content:space-between;}
+.dp-header h2{font-family:var(--font-serif);font-size:22px;color:#fff;font-weight:700;}
+.dp-header p{font-size:12px;color:rgba(255,255,255,.65);margin-top:3px;}
+.dp-close{background:rgba(255,255,255,.18);border:none;color:#fff;width:30px;height:30px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.dp-body{padding:24px;}
+.dp-section{margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--border);}
+.dp-section:last-child{border-bottom:none;}
+.dp-section h3{font-family:var(--font-serif);font-size:16px;color:var(--green);font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.dp-section p,.dp-editable{font-size:14px;color:var(--text);line-height:1.7;width:100%;}
+body.admin .dp-editable{outline:1px dashed var(--red);outline-offset:2px;border-radius:2px;cursor:text;padding:2px 4px;}
+body.admin .dp-editable:focus{outline:2px solid var(--green);background:#fffdf0;}
+.dp-budget-box{background:var(--green);color:#fff;border-radius:var(--rl);padding:18px;text-align:center;}
+.dp-budget-num{font-family:var(--font-serif);font-size:32px;font-weight:700;color:var(--yellow);}
+.dp-budget-lbl{font-size:12px;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.08em;margin-top:4px;}
+body.admin .dp-budget-num{outline:1px dashed var(--yellow);border-radius:3px;cursor:text;}
+body.admin .dp-budget-num:focus{outline:2px solid #fff;}
+
+/* BUDGET */
+.budget-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:28px;overflow-x:auto;}
+.btab{background:none;border:none;padding:10px 18px;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap;}
+.btab.active{color:var(--green);border-bottom-color:var(--green);font-weight:600;}
+.btab:hover{color:var(--green);}
+.budget-panel{display:none;}.budget-panel.active{display:block;}
+.budget-table{width:100%;border-collapse:collapse;margin-bottom:24px;}
+.budget-table th{background:var(--green);color:#fff;padding:10px 14px;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.06em;}
+.budget-table td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px;}
+.budget-table tr:nth-child(even) td{background:var(--off);}
+.budget-table tr:hover td{background:var(--yellow-light);}
+body.admin .budget-table td.editable{cursor:text;}
+.chart-wrap{background:#fff;border:1px solid var(--border);border-radius:var(--rl);padding:20px;box-shadow:var(--sh);margin-bottom:20px;}
+.chart-wrap h3{font-family:var(--font-serif);font-size:16px;color:var(--green);margin-bottom:14px;}
+
+/* LOCAL GOV */
+.county-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;}
+.ctab{background:#fff;border:1px solid var(--border);padding:8px 16px;border-radius:20px;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;transition:all .2s;}
+.ctab.active{background:var(--green);color:#fff;border-color:var(--green);}
+.ctab:hover:not(.active){border-color:var(--green);color:var(--green);}
+.county-panel{display:none;}.county-panel.active{display:block;}
+.county-header{background:var(--green);color:#fff;border-radius:var(--rl);padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;}
+.county-header h2{font-family:var(--font-serif);font-size:22px;font-weight:700;}
+.county-header p{font-size:13px;color:rgba(255,255,255,.7);margin-top:4px;}
+.county-seal{width:48px;height:48px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.county-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.county-dates-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.county-date-item{background:var(--off);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:12px;font-size:13px;position:relative;}
+.cdi-dot{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;}
+.cdi-del{display:none !important;}body.admin .cdi-del{display:inline-flex !important;background:var(--red);color:#fff;border:none;border-radius:3px;padding:2px 7px;font-size:10px;font-weight:700;cursor:pointer;margin-left:auto;}
+
+/* PARLIAMENT DATES */
+.parl-dates-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+.parl-date-item{background:#fff;border:1px solid var(--border);border-radius:var(--rl);padding:14px 18px;display:flex;align-items:flex-start;gap:14px;box-shadow:var(--sh);position:relative;}
+.pdi-left{background:var(--green);color:#fff;border-radius:var(--r);text-align:center;padding:7px 10px;min-width:50px;flex-shrink:0;}
+.pdi-left .mo{font-size:10px;text-transform:uppercase;color:rgba(255,255,255,.7);letter-spacing:.08em;}
+.pdi-left .dy{font-family:var(--font-serif);font-size:20px;font-weight:700;line-height:1;}
+.pdi-body h4{font-size:14px;font-weight:600;color:var(--green);}
+.pdi-body p{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.pdi-del{display:none !important;}body.admin .pdi-del{display:inline-flex !important;position:absolute;top:8px;right:10px;background:var(--red);color:#fff;border:none;border-radius:3px;padding:2px 8px;font-size:10px;font-weight:700;cursor:pointer;}
+
+/* ORG CHART */
+.org-chart{overflow-x:auto;padding:10px 0;}
+.org-level{display:flex;justify-content:center;gap:0;position:relative;}
+.org-level::before{content:\'\';position:absolute;top:0;left:50%;width:2px;height:30px;background:var(--border);transform:translateX(-50%);}
+.org-level:first-child::before{display:none;}
+.org-node{display:flex;flex-direction:column;align-items:center;position:relative;}
+.org-box{background:#fff;border:2px solid var(--border);border-radius:var(--rl);padding:14px 18px;text-align:center;min-width:160px;max-width:200px;transition:all .2s;cursor:default;box-shadow:var(--sh);position:relative;}
+.org-box:hover{border-color:var(--green);box-shadow:var(--shl);}
+.org-box.striker{border-color:var(--red);border-width:3px;background:var(--red-light);}
+.org-box.pm{border-color:var(--green);border-width:2px;background:var(--off);}
+.org-box.dept-head{border-color:var(--yellow-dark);}
+.org-box.deputy{border-color:var(--gray);}
+.org-title{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-light);font-weight:600;margin-bottom:3px;}
+.org-name{font-family:var(--font-serif);font-size:14px;font-weight:700;color:var(--text);line-height:1.2;}
+.org-dept{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.org-connector{width:2px;height:28px;background:var(--border);margin:0 auto;}
+.org-row{display:flex;gap:0;justify-content:center;}
+.org-h-line{height:2px;background:var(--border);}
+.tree{display:flex;flex-direction:column;align-items:center;}
+.tree-children{display:flex;gap:0;align-items:flex-start;}
+.tree-child{display:flex;flex-direction:column;align-items:center;}
+.tree-child .org-box{min-width:140px;max-width:170px;}
+.tree-child .org-box.deputy{min-width:130px;max-width:155px;}
+body.admin .org-name{outline:1px dashed var(--red);border-radius:2px;cursor:text;padding:0 2px;}
+body.admin .org-name:focus{outline:2px solid var(--green);background:#fffdf0;}
+body.admin .org-dept{outline:1px dashed rgba(200,16,46,.4);border-radius:2px;cursor:text;padding:0 2px;}
+
+/* EMBASSY */
+.emb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.emb-card{background:#fff;border:1px solid var(--border);border-radius:var(--rl);padding:18px;box-shadow:var(--sh);position:relative;transition:all .2s;}
+.emb-card:hover{box-shadow:var(--shl);}
+.emb-flag{font-size:28px;margin-bottom:8px;}
+.emb-card h4{font-family:var(--font-serif);font-size:15px;font-weight:600;color:var(--green);margin-bottom:4px;}
+.emb-card .emb-type{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--red);font-weight:700;margin-bottom:8px;}
+.emb-card p{font-size:12px;color:var(--text-muted);line-height:1.6;}
+.emb-card .emb-contact{font-size:12px;color:var(--text-muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+
+/* MAP */
+.map-drop{border:3px dashed var(--gray);border-radius:var(--rl);padding:60px 40px;text-align:center;cursor:pointer;transition:all .2s;background:var(--off);}
+.map-drop:hover{border-color:var(--green);background:#f0f7f4;}
+.map-drop.has-image{border:none;padding:0;background:transparent;}
+.map-drop img{width:100%;border-radius:var(--rl);box-shadow:var(--shl);}
+
+/* CONTACT */
+.contact-county-list{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.contact-county-card{background:#fff;border:1px solid var(--border);border-radius:var(--rl);padding:18px;box-shadow:var(--sh);}
+.contact-county-card h4{font-family:var(--font-serif);font-size:15px;font-weight:600;color:var(--green);margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--yellow);}
+.contact-county-card p{font-size:12px;color:var(--text-muted);line-height:1.8;}
+
+/* NEWS / CNN */
+.news-grid{display:grid;grid-template-columns:2fr 1fr;gap:24px;}
+.cnn-frame{border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:var(--sh);height:600px;}
+.cnn-frame iframe{width:100%;height:100%;border:none;}
+
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;align-items:center;justify-content:center;padding:16px;}
+.mo.open{display:flex;}
+.mo-box{background:#fff;border-radius:var(--rl);max-width:600px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.3);}
+.mo-box.wide{max-width:800px;}
+.mo-hdr{background:var(--green);color:#fff;padding:20px 24px;border-radius:var(--rl) var(--rl) 0 0;display:flex;align-items:flex-start;justify-content:space-between;}
+.mo-hdr .ybar{height:3px;background:var(--yellow);border-radius:2px;margin-bottom:8px;}
+.mo-hdr h3{font-family:var(--font-serif);font-size:20px;font-weight:700;}
+.mo-hdr p{font-size:12px;color:rgba(255,255,255,.65);margin-top:3px;}
+.mo-x{background:rgba(255,255,255,.18);border:none;color:#fff;width:28px;height:28px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mo-body{padding:24px;}
+.mo-foot{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+.fg{margin-bottom:16px;}
+.fg label{display:block;font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.fg label .req{color:var(--red);margin-left:2px;}
+.fg input,.fg select,.fg textarea{width:100%;padding:9px 13px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;font-family:var(--font-sans);color:var(--text);outline:none;transition:border-color .2s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(26,61,43,.08);}
+.fg textarea{resize:vertical;min-height:80px;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.f-notice{background:var(--yellow-light);border:1px solid #ffe082;border-radius:var(--r);padding:10px 13px;font-size:12px;color:#7a4f00;margin-bottom:14px;display:flex;gap:8px;}
+.f-success{display:none;background:var(--success-bg);border:1px solid #a8d8b9;border-radius:var(--r);padding:18px;text-align:center;margin-bottom:14px;}
+.f-success .si{font-size:32px;margin-bottom:6px;}
+.f-success h4{color:var(--success);font-family:var(--font-serif);font-size:17px;}
+.f-success p{font-size:12px;color:var(--text-muted);margin-top:4px;}
+
+/* SUBMISSIONS LIST */
+.sub-list{display:flex;flex-direction:column;gap:8px;max-height:380px;overflow-y:auto;}
+.sub-item{background:var(--off);border-radius:var(--r);padding:10px 13px;font-size:12px;}
+.sub-ref{font-weight:700;color:var(--red);margin-bottom:2px;font-size:11px;}
+.sub-type{font-weight:600;color:var(--text);}
+.sub-date{color:var(--text-light);font-size:11px;}
+
+/* FOOTER */
+footer{background:var(--green-dark);color:rgba(255,255,255,.7);padding:44px 0 0;}
+.ft-tri{height:4px;background:linear-gradient(to right,var(--red) 33.33%,#fff 33.33% 66.66%,var(--yellow) 66.66%);margin-bottom:44px;}
+.ft-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;margin-bottom:32px;}
+.ft-brand h2{font-family:var(--font-serif);font-size:17px;color:#fff;margin-bottom:6px;}
+.ft-brand p{font-size:12px;line-height:1.7;max-width:240px;}
+.ft-col h3{font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--yellow);margin-bottom:10px;}
+.ft-col ul{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.ft-col ul li a{font-size:12px;color:rgba(255,255,255,.6);transition:color .2s;}.ft-col ul li a:hover{color:#fff;}
+.ft-bottom{border-top:1px solid rgba(255,255,255,.08);padding:13px 0;display:flex;justify-content:space-between;align-items:center;font-size:11px;}
+
+/* TAG SELECT */
+.tag-opts{display:flex;gap:7px;flex-wrap:wrap;}
+.topt{padding:4px 11px;border-radius:20px;border:1px solid var(--border);font-size:12px;font-weight:600;cursor:pointer;background:#fff;transition:all .2s;}
+.topt.sel-notice{background:#e8f0fb;color:#1a3d7a;border-color:#b5ccf0;}
+.topt.sel-urgent{background:var(--red-light);color:var(--red);border-color:var(--red);}
+.topt.sel-event{background:#eaf6ef;color:#1a6e3a;border-color:#a8d8b9;}
+.topt.sel-tender{background:var(--yellow-light);color:#7a4f00;border-color:#ffe082;}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .hero-grid,.ann-grid,.grid2,.news-grid{grid-template-columns:1fr;}
+  .hero-quick,.dept-grid{grid-template-columns:repeat(2,1fr);}
+  .fc-grid,.el-grid,.emb-grid,.contact-county-list{grid-template-columns:1fr 1fr;}
+  .stats-grid,.ft-grid{grid-template-columns:repeat(2,1fr);}
+  .county-grid{grid-template-columns:1fr;}
+}
+@media(max-width:600px){
+  .fc-grid,.el-grid,.emb-grid,.contact-county-list,.dept-grid{grid-template-columns:1fr;}
+  .header-search{display:none;}
+  .hero h2{font-size:32px;}
+  .frow{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="tricolor"></div>
+
+<!-- TOP STRIP -->
+<div class="top-strip">
+  <div class="inner">
+    <span>🏛 Official website of the Government of Amplon — Verify authenticity before sharing personal information.</span>
+    <div class="links">
+      <a href="#">Accessibility</a>
+      <a href="#">Languages</a>
+      <a href="#">Contact</a>
+      <button class="admin-btn-top" id="adminToggle" onclick="toggleAdmin()">⚙ Admin Mode</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN BAR -->
+<div id="adminBar">
+  <div class="ab-inner">
+    <span class="lbl">⚙ ADMIN</span>
+    <button class="aab y" onclick="openMo(\'moNews\')">＋ Announcement</button>
+    <button class="aab y" onclick="openMo(\'moAddForm\')">＋ Service Form</button>
+    <button class="aab y" onclick="openMo(\'moAddParl\')">＋ Parliament Date</button>
+    <button class="aab" onclick="openMo(\'moSubs\')">📋 Submissions</button>
+    <button class="aab" onclick="openMo(\'moEditStats\')">📊 Edit Stats</button>
+    <span class="ab-hint">Click highlighted text to edit inline</span>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-main">
+    <img class="logo-img" src="LOGO_PLACEHOLDER" alt="Government of Amplon"/>
+    <div class="header-search">
+      <input type="text" placeholder="Search services, forms, departments…"/>
+      <button>Search</button>
+    </div>
+  </div>
+  <nav>
+    <div class="nav-inner">
+      <button onclick="showPage(\'home\')" class="active" id="nav-home">Home</button>
+      <button onclick="showPage(\'news\')" id="nav-news">News — CNN</button>
+      <button onclick="showPage(\'announcements\')" id="nav-ann">Announcements</button>
+      <button onclick="showPage(\'forms\')" id="nav-forms">Forms &amp; Services</button>
+      <button onclick="showPage(\'elections\')" id="nav-elec">Elections</button>
+      <button onclick="showPage(\'parliament\')" id="nav-parl">Parliament</button>
+      <button onclick="showPage(\'departments\')" id="nav-dept">Departments</button>
+      <button onclick="showPage(\'budget\')" id="nav-budget">Budget &amp; Finance</button>
+      <button onclick="showPage(\'localgov\')" id="nav-local">Local Government</button>
+      <button onclick="showPage(\'government\')" id="nav-gov">Current Government</button>
+      <button onclick="showPage(\'embassies\')" id="nav-emb">Embassies</button>
+      <button onclick="showPage(\'map\')" id="nav-map">Map</button>
+      <button onclick="showPage(\'contact\')" id="nav-contact">Contact</button>
+    </div>
+  </nav>
+</header>
+
+<!-- ALERT -->
+<div class="alert-bar" id="alertBar">
+  <div class="inner">
+    <span class="alert-badge">Notice</span>
+    <span class="editable" contenteditable="false" id="alertText">National Census 2025 underway — All citizens must participate. <a href="#">Register online →</a></span>
+    <button class="alert-x" onclick="document.getElementById(\'alertBar\').style.display=\'none\'">×</button>
+  </div>
+</div>
+
+<!-- ═══ HOME ═══ -->
+<div class="page active" id="page-home">
+  <section class="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div>
+          <p class="hero-eyebrow">Official Government of Amplon Portal</p>
+          <h2 class="editable" contenteditable="false">Serving the People of Amplon</h2>
+          <p class="editable" contenteditable="false">Access government services, submit applications, stay informed on legislation, and engage with your government — all in one place.</p>
+          <div class="hero-btns">
+            <button class="btn btn-yellow" onclick="showPage(\'forms\')">Submit a Request</button>
+            <button class="btn btn-outline-white" onclick="showPage(\'departments\')" style="background:transparent;border:2px solid rgba(255,255,255,.4);color:#fff;">Browse Departments</button>
+          </div>
+        </div>
+        <div class="hero-quick">
+          <h3>Quick Services</h3>
+          <div class="ql">
+            <button class="ql-btn" onclick="openForm(\'permit\')"><span class="ql-icon">🏗️</span> Building Permit<span style="margin-left:auto;opacity:.5;font-size:11px;">→</span></button>
+            <button class="ql-btn" onclick="openForm(\'business\')"><span class="ql-icon">💼</span> Business Registration<span style="margin-left:auto;opacity:.5;font-size:11px;">→</span></button>
+            <button class="ql-btn" onclick="openForm(\'complaint\')"><span class="ql-icon">📢</span> File a Complaint<span style="margin-left:auto;opacity:.5;font-size:11px;">→</span></button>
+            <button class="ql-btn" onclick="openForm(\'voter\')"><span class="ql-icon">🗳️</span> Voter Registration<span style="margin-left:auto;opacity:.5;font-size:11px;">→</span></button>
+            <button class="ql-btn" onclick="openForm(\'passport\')"><span class="ql-icon">🛂</span> Passport Application<span style="margin-left:auto;opacity:.5;font-size:11px;">→</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="stats-bar">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item"><div class="stat-num editable" contenteditable="false" data-si="0">3.2M</div><div class="stat-lbl editable" contenteditable="false">Citizens of Amplon</div></div>
+        <div class="stat-item"><div class="stat-num editable" contenteditable="false" data-si="1">14</div><div class="stat-lbl editable" contenteditable="false">Government Departments</div></div>
+        <div class="stat-item"><div class="stat-num editable" contenteditable="false" data-si="2">94%</div><div class="stat-lbl editable" contenteditable="false">Requests Resolved in 14 Days</div></div>
+        <div class="stat-item"><div class="stat-num editable" contenteditable="false" data-si="3">8,140</div><div class="stat-lbl editable" contenteditable="false">Forms Processed This Month</div></div>
+      </div>
+    </div>
+  </div>
+  <section class="sec sec-alt">
+    <div class="container">
+      <span class="sec-label">Recent</span>
+      <h2 class="sec-title">Latest Announcements</h2>
+      <p class="sec-sub">Key government notices. <button class="btn btn-sm btn-sm-green" onclick="showPage(\'announcements\')" style="margin-left:8px;">View All →</button></p>
+      <div class="grid3" id="homeAnnPreview"></div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ CNN NEWS ═══ -->
+<div class="page" id="page-news">
+  <section class="sec">
+    <div class="container">
+      <span class="sec-label">Media</span>
+      <h2 class="sec-title">Crystal News Network — CNN</h2>
+      <p class="sec-sub">The Republic of Amplon\'s independent news voice. Live stories, breaking news, and community reports.</p>
+      <div class="news-grid">
+        <div class="cnn-frame"><iframe src="https://spollenjack.github.io/Crystal-News-Network/" title="Crystal News Network" allowfullscreen></iframe></div>
+        <div>
+          <div class="card" style="margin-bottom:16px;">
+            <h3 style="font-family:var(--font-serif);color:var(--green);font-size:16px;margin-bottom:10px;">📡 About CNN</h3>
+            <p style="font-size:13px;color:var(--text-muted);line-height:1.7;">Crystal News Network is Amplon\'s independent community news platform. Citizens can file reports, read breaking stories, and stay informed about events across the Republic.</p>
+            <a href="https://spollenjack.github.io/Crystal-News-Network/" target="_blank" style="display:inline-block;margin-top:12px;" class="btn btn-sm btn-sm-green">Open CNN Full Site →</a>
+          </div>
+          <div class="card">
+            <h3 style="font-family:var(--font-serif);color:var(--green);font-size:16px;margin-bottom:10px;">📝 Submit a Story</h3>
+            <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:12px;">Any citizen of Amplon can file a news report to Crystal News Network. Reports are published immediately.</p>
+            <a href="https://spollenjack.github.io/Crystal-News-Network/" target="_blank" class="btn btn-red" style="font-size:13px;padding:9px 18px;">File a Report →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ ANNOUNCEMENTS ═══ -->
+<div class="page" id="page-announcements">
+  <section class="sec">
+    <div class="container">
+      <span class="sec-label">Official Communications</span>
+      <h2 class="sec-title">News &amp; Announcements <button class="adm-add" onclick="openMo(\'moNews\')">＋ Add</button></h2>
+      <p class="sec-sub editable" contenteditable="false">Official notices, press releases, public hearings, tenders, and updates from the Government of Amplon.</p>
+      <div class="ann-grid">
+        <div class="ann-list" id="annList">
+          <div class="ann-card featured" data-id="1">
+            <button class="adm-del" onclick="this.closest(\'.ann-card\').remove()">✕</button>
+            <div class="ann-date"><div class="mo">May</div><div class="dy">10</div></div>
+            <div class="ann-body"><span class="ann-tag t-urgent">Urgent</span><h4 class="editable" contenteditable="false">National Census 2025 — Mandatory Participation</h4><p class="editable" contenteditable="false">All households are required by law to participate in the 2025 National Census. Officers will visit districts May 15 – June 30. Online submission also available.</p><a href="#" style="color:var(--red);font-size:13px;font-weight:600;display:inline-block;margin-top:6px;">Read full notice →</a></div>
+          </div>
+          <div class="ann-card" data-id="2">
+            <button class="adm-del" onclick="this.closest(\'.ann-card\').remove()">✕</button>
+            <div class="ann-date"><div class="mo">May</div><div class="dy">08</div></div>
+            <div class="ann-body"><span class="ann-tag t-notice">Notice</span><h4 class="editable" contenteditable="false">FY2025–26 National Budget Presented to Parliament</h4><p class="editable" contenteditable="false">The Minister of Finance presented the national budget of A$12.4 billion. Key priorities: healthcare expansion, road infrastructure, and education reform.</p><a href="#" style="color:var(--red);font-size:13px;font-weight:600;display:inline-block;margin-top:6px;">Read full notice →</a></div>
+          </div>
+          <div class="ann-card" data-id="3">
+            <button class="adm-del" onclick="this.closest(\'.ann-card\').remove()">✕</button>
+            <div class="ann-date"><div class="mo">May</div><div class="dy">05</div></div>
+            <div class="ann-body"><span class="ann-tag t-tender">Tender</span><h4 class="editable" contenteditable="false">RFP: National Highway Corridor Upgrade</h4><p class="editable" contenteditable="false">The Department of Infrastructure invites qualified contractors to submit proposals for the North–South Highway Corridor upgrade. Submissions close July 15, 2025.</p><a href="#" style="color:var(--red);font-size:13px;font-weight:600;display:inline-block;margin-top:6px;">Download documents →</a></div>
+          </div>
+          <div class="ann-card" data-id="4">
+            <button class="adm-del" onclick="this.closest(\'.ann-card\').remove()">✕</button>
+            <div class="ann-date"><div class="mo">Apr</div><div class="dy">28</div></div>
+            <div class="ann-body"><span class="ann-tag t-event">Event</span><h4 class="editable" contenteditable="false">Amplon National Day Celebrations — June 1st</h4><p class="editable" contenteditable="false">Citizens are invited to join National Day festivities at Central Plaza, Capital City, featuring cultural displays, fireworks, and a keynote by the Prime Minister.</p><a href="#" style="color:var(--red);font-size:13px;font-weight:600;display:inline-block;margin-top:6px;">View programme →</a></div>
+          </div>
+          <div class="ann-add-ph" onclick="openMo(\'moNews\')"><p style="color:var(--green);font-weight:600;font-size:14px;">＋ Click to add a new announcement</p></div>
+        </div>
+        <div>
+          <div class="sb-card">
+            <h3>📅 Upcoming Sittings</h3>
+            <div class="ev-item"><div class="ev-dot"></div><div><p class="editable" contenteditable="false">Parliamentary Session — Budget Debate</p><span class="editable" contenteditable="false">May 14, 2025 — 9:00 AM, Parliament House</span></div></div>
+            <div class="ev-item"><div class="ev-dot"></div><div><p class="editable" contenteditable="false">Cabinet Meeting</p><span class="editable" contenteditable="false">May 19, 2025 — 10:00 AM</span></div></div>
+            <div class="ev-item"><div class="ev-dot"></div><div><p class="editable" contenteditable="false">Public Consultation: Land Reform Bill</p><span class="editable" contenteditable="false">May 22, 2025 — 2:00 PM</span></div></div>
+          </div>
+          <div class="sb-card">
+            <h3>📞 Key Contacts</h3>
+            <div class="ev-item"><div class="ev-dot" style="background:var(--red);"></div><div><p style="font-weight:700;">Emergency</p><span style="font-size:15px;font-weight:700;color:var(--red);" class="editable" contenteditable="false">1-1-2</span></div></div>
+            <div class="ev-item"><div class="ev-dot"></div><div><p class="editable" contenteditable="false">Government Hotline</p><span class="editable" contenteditable="false">0800 GOV AMP</span></div></div>
+            <div class="ev-item"><div class="ev-dot"></div><div><p class="editable" contenteditable="false">Anti-Corruption Tip Line</p><span class="editable" contenteditable="false">0800 100 200</span></div></div>
+          </div>
+          <div class="sb-card">
+            <h3>🔔 Alert Subscription</h3>
+            <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">Receive official notices and emergency alerts.</p>
+            <input type="email" placeholder="Your email" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;font-family:var(--font-sans);margin-bottom:8px;outline:none;"/>
+            <button class="btn-sub" style="width:100%;padding:8px;">Subscribe</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ FORMS ═══ -->
+<div class="page" id="page-forms">
+  <section class="sec sec-alt">
+    <div class="container">
+      <span class="sec-label">Online Services</span>
+      <h2 class="sec-title">Forms &amp; Applications <button class="adm-add" onclick="openMo(\'moAddForm\')">＋ Add</button></h2>
+      <p class="sec-sub editable" contenteditable="false">Submit official requests electronically. All submissions acknowledged within one business day.</p>
+      <div class="fc-grid" id="formCards">
+        <div class="fc" onclick="openForm(\'permit\')"><div class="fc-icon">🏗️</div><h4>Building &amp; Construction Permit</h4><p>Apply for permits for new construction, renovation, or structural work.</p><div class="fc-meta"><span>Dept. of Infrastructure</span><span class="fc-time">⏱ 10–15 days</span></div></div>
+        <div class="fc" onclick="openForm(\'business\')"><div class="fc-icon">💼</div><h4>Business Registration</h4><p>Register a new business or renew an existing license to operate in Amplon.</p><div class="fc-meta"><span>Dept. of Commerce</span><span class="fc-time">⏱ 5–7 days</span></div></div>
+        <div class="fc" onclick="openForm(\'complaint\')"><div class="fc-icon">📢</div><h4>Public Complaint</h4><p>Report infrastructure issues, service failures, or public safety concerns.</p><div class="fc-meta"><span>Office of the Ombudsman</span><span class="fc-time">⏱ 3–5 days</span></div></div>
+        <div class="fc" onclick="openForm(\'records\')"><div class="fc-icon">📁</div><h4>Freedom of Information</h4><p>Request access to public records, government documents, meeting minutes.</p><div class="fc-meta"><span>Dept. of Justice</span><span class="fc-time">⏱ 20 days</span></div></div>
+        <div class="fc" onclick="openForm(\'voter\')"><div class="fc-icon">🗳️</div><h4>Voter Registration</h4><p>Register to vote, update details, or check your registration status.</p><div class="fc-meta"><span>Electoral Commission</span><span class="fc-time">⏱ 2–3 days</span></div></div>
+        <div class="fc" onclick="openForm(\'passport\')"><div class="fc-icon">🛂</div><h4>Passport Application</h4><p>Apply for a new Amplonian passport or renew an existing one.</p><div class="fc-meta"><span>Dept. of Home Affairs</span><span class="fc-time">⏱ 15–21 days</span></div></div>
+        <div class="fc" onclick="openForm(\'social\')"><div class="fc-icon">🤝</div><h4>Social Services</h4><p>Apply for housing assistance, grants, food security, or family support.</p><div class="fc-meta"><span>Dept. of Social Development</span><span class="fc-time">⏱ 10 days</span></div></div>
+        <div class="fc" onclick="openForm(\'employment\')"><div class="fc-icon">👔</div><h4>Government Employment</h4><p>Apply for open positions across government departments.</p><div class="fc-meta"><span>Public Service Commission</span><span class="fc-time">⏱ Varies</span></div></div>
+        <div class="fc" onclick="openForm(\'event\')"><div class="fc-icon">🎪</div><h4>Special Event Permit</h4><p>Apply to host public events, demonstrations, or use government venues.</p><div class="fc-meta"><span>Dept. of Internal Affairs</span><span class="fc-time">⏱ 15 days</span></div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ ELECTIONS ═══ -->
+<div class="page" id="page-elections">
+  <section class="sec">
+    <div class="container">
+      <span class="sec-label">Democratic Participation</span>
+      <h2 class="sec-title">Upcoming Elections</h2>
+      <p class="sec-sub editable" contenteditable="false">Stay informed on scheduled elections, candidate nominations, and your right to vote as a citizen of Amplon.</p>
+      <div class="voter-banner"><div class="icon">🗳️</div><div><h3>Are You Registered to Vote?</h3><p class="editable" contenteditable="false">Registration deadline for the General Election: <strong>July 20, 2025</strong>. Register today.</p></div><button class="vr-btn" onclick="openForm(\'voter\')">Register Now</button></div>
+      <div class="el-grid">
+        <div class="el-card"><div class="el-hdr"><div class="el-type">General Election</div><h3 class="editable" contenteditable="false">National Assembly — Amplon</h3><div class="el-cd"><div class="num">102</div><div class="lbl">Days</div></div></div><div class="el-body"><div class="el-info"><div><label>Date</label><span class="editable" contenteditable="false">August 20, 2025</span></div><div><label>Seats</label><span class="editable" contenteditable="false">120 Parliamentary Seats</span></div><div><label>Reg. Deadline</label><span class="editable" contenteditable="false">July 20, 2025</span></div><div><label>Early Voting</label><span class="editable" contenteditable="false">Aug 14–17, 2025</span></div></div><div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn-sm btn-sm-green" onclick="openForm(\'voter\')">Register</button><button class="btn-sm btn-sm-out">Candidates</button><button class="btn-sm btn-sm-out">Polling Stations</button></div></div></div>
+        <div class="el-card"><div class="el-hdr"><div class="el-type">By-Election</div><h3 class="editable" contenteditable="false">Constituency 7 — Northern Province</h3><div class="el-cd"><div class="num">31</div><div class="lbl">Days</div></div></div><div class="el-body"><div class="el-info"><div><label>Date</label><span class="editable" contenteditable="false">June 10, 2025</span></div><div><label>Eligible</label><span class="editable" contenteditable="false">Constituency 7 Residents</span></div><div><label>Reg. Deadline</label><span class="editable" contenteditable="false">May 30, 2025</span></div><div><label>Polling Hours</label><span class="editable" contenteditable="false">7:00 AM – 8:00 PM</span></div></div><div style="display:flex;gap:8px;"><button class="btn-sm btn-sm-green" onclick="openForm(\'voter\')">Check Reg.</button><button class="btn-sm btn-sm-out">Candidates</button></div></div></div>
+        <div class="el-card"><div class="el-hdr" style="background:#555;"><div class="el-type">Local Government</div><h3 class="editable" contenteditable="false">Regional Council Elections</h3><div class="el-cd"><div class="num">198</div><div class="lbl">Days</div></div></div><div class="el-body"><div class="el-info"><div><label>Date</label><span class="editable" contenteditable="false">Nov 25, 2025</span></div><div><label>Positions</label><span class="editable" contenteditable="false">All Regional Councils</span></div><div><label>Nominations</label><span class="editable" contenteditable="false">Aug 1 – Sep 30</span></div><div><label>Reg. Deadline</label><span class="editable" contenteditable="false">Oct 25, 2025</span></div></div><div style="display:flex;gap:8px;"><button class="btn-sm btn-sm-green">Reminder</button><button class="btn-sm btn-sm-out">Guide</button></div></div></div>
+        <div class="el-card"><div class="el-hdr" style="background:#1a6e3a;"><div class="el-type">Referendum</div><h3 class="editable" contenteditable="false">Constitutional Amendment Referendum</h3><div class="el-cd"><div class="num">102</div><div class="lbl">Days</div></div></div><div class="el-body"><div class="el-info"><div><label>Date</label><span class="editable" contenteditable="false">August 20, 2025</span></div><div><label>Question</label><span class="editable" contenteditable="false">Presidential Term Limits</span></div><div><label>Eligible</label><span class="editable" contenteditable="false">All Registered Citizens</span></div><div><label>Majority Needed</label><span class="editable" contenteditable="false">2/3 Majority</span></div></div><div style="display:flex;gap:8px;"><button class="btn-sm btn-sm-green">Read Proposal</button><button class="btn-sm btn-sm-out">Consultation</button></div></div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ PARLIAMENT ═══ -->
+<div class="page" id="page-parliament">
+  <section class="sec">
+    <div class="container">
+      <span class="sec-label">Legislature</span>
+      <h2 class="sec-title">Parliament of Amplon <button class="adm-add" onclick="openMo(\'moAddParl\')">＋ Add Date</button></h2>
+      <p class="sec-sub editable" contenteditable="false">Official parliamentary calendar, sitting dates, debates, and committee schedules for the Parliament of Amplon.</p>
+      <div class="grid2" style="gap:28px;align-items:start;">
+        <div>
+          <h3 style="font-family:var(--font-serif);color:var(--green);font-size:20px;margin-bottom:16px;">📅 Important Parliamentary Dates</h3>
+          <div class="parl-dates-list" id="parlDatesList">
+            <div class="parl-date-item"><button class="pdi-del" onclick="this.closest(\'.parl-date-item\').remove()">✕ Delete</button><div class="pdi-left"><div class="mo">May</div><div class="dy">14</div></div><div class="pdi-body"><h4 class="editable" contenteditable="false">Budget Debate — Second Reading</h4><p class="editable" contenteditable="false">Parliament House, Chamber A — 9:00 AM | All Members Attending</p></div></div>
+            <div class="parl-date-item"><button class="pdi-del" onclick="this.closest(\'.parl-date-item\').remove()">✕ Delete</button><div class="pdi-left"><div class="mo">May</div><div class="dy">22</div></div><div class="pdi-body"><h4 class="editable" contenteditable="false">Land Reform Bill — First Reading</h4><p class="editable" contenteditable="false">Parliament House — 2:00 PM | Committee Stage</p></div></div>
+            <div class="parl-date-item"><button class="pdi-del" onclick="this.closest(\'.parl-date-item\').remove()">✕ Delete</button><div class="pdi-left"><div class="mo">Jun</div><div class="dy">03</div></div><div class="pdi-body"><h4 class="editable" contenteditable="false">Question Time — Prime Minister</h4><p class="editable" contenteditable="false">Parliament House — 11:00 AM | Open to Public Gallery</p></div></div>
+            <div class="parl-date-item"><button class="pdi-del" onclick="this.closest(\'.parl-date-item\').remove()">✕ Delete</button><div class="pdi-left"><div class="mo">Jun</div><div class="dy">17</div></div><div class="pdi-body"><h4 class="editable" contenteditable="false">National Security Bill — Committee Report</h4><p class="editable" contenteditable="false">Parliament House — 10:00 AM | Restricted Gallery</p></div></div>
+            <div class="parl-date-item"><button class="pdi-del" onclick="this.closest(\'.parl-date-item\').remove()">✕ Delete</button><div class="pdi-left"><div class="mo">Jul</div><div class="dy">01</div></div><div class="pdi-body"><h4 class="editable" contenteditable="false">Summer Recess Begins</h4><p class="editable" contenteditable="false">Parliament recesses until September 8, 2025.</p></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:16px;">
+            <h3 style="font-family:var(--font-serif);color:var(--green);font-size:16px;margin-bottom:10px;">🏛 Parliament of Amplon</h3>
+            <p style="font-size:13px;color:var(--text-muted);line-height:1.7;" class="editable" contenteditable="false">The Parliament of Amplon is the supreme legislative body of the Republic. It consists of the National Assembly (lower house) and the Senate (upper house). Parliament sits in the capital city at Parliament House.</p>
+            <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div style="background:var(--off);border-radius:var(--r);padding:10px;text-align:center;"><div style="font-family:var(--font-serif);font-size:22px;font-weight:700;color:var(--green);" class="editable" contenteditable="false">120</div><div style="font-size:11px;color:var(--text-muted);">Assembly Seats</div></div>
+              <div style="background:var(--off);border-radius:var(--r);padding:10px;text-align:center;"><div style="font-family:var(--font-serif);font-size:22px;font-weight:700;color:var(--green);" class="editable" contenteditable="false">40</div><div style="font-size:11px;color:var(--text-muted);">Senate Seats</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 style="font-family:var(--font-serif);color:var(--green);font-size:16px;margin-bottom:10px;">📋 Current Bills Before Parliament</h3>
+            <div class="ev-item"><div class="ev-dot"></div><div><p class="editable" contenteditable="false">National Budget Bill 2025–26</p><span class="editable" contenteditable="false">Second Reading — Finance Committee</span></div></div>
+            <div class="ev-item"><div class="ev-dot"></div><div><p class="editable" contenteditable="false">Land Reform and Redistribution Act</p><span class="editable" contenteditable="false">First Reading — Agriculture Committee</span></div></div>
+            <div class="ev-item"><div class="ev-dot"></div><div><p class="editable" contenteditable="false">National Security Enhancement Bill</p><span class="editable" contenteditable="false">Committee Stage — Defence Committee</span></div></div>
+            <div class="ev-item"><div class="ev-dot"></div><div><p class="editable" contenteditable="false">Environmental Protection Amendment</p><span class="editable" contenteditable="false">Public Consultation Phase</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ DEPARTMENTS ═══ -->
+<div class="page" id="page-departments">
+  <section class="sec sec-alt">
+    <div class="container">
+      <span class="sec-label">Government Structure</span>
+      <h2 class="sec-title">Departments <button class="adm-add" onclick="openMo(\'moAddDept\')">＋ Add</button></h2>
+      <p class="sec-sub editable" contenteditable="false">Click any department to view roles, responsibilities, headquarters, and budget. All details can be edited in Admin Mode.</p>
+      <div class="dept-grid" id="deptGrid">
+        <div class="dept-card" onclick="openDept(\'taoiseach\')"><div class="dept-icon" style="background:#fdeaed;">🏛️</div><h4>Office of the Prime Minister</h4><p>Executive leadership and national policy direction.</p><div class="dept-view">View Details →</div></div>
+        <div class="dept-card" onclick="openDept(\'finance\')"><div class="dept-icon" style="background:#fffbe6;">💰</div><h4>Dept. of Finance</h4><p>National revenue, taxation, fiscal policy, and budget management.</p><div class="dept-view">View Details →</div></div>
+        <div class="dept-card" onclick="openDept(\'health\')"><div class="dept-icon" style="background:#eaf6ef;">🏥</div><h4>Dept. of Health</h4><p>Public health, hospitals, disease control, and health policy.</p><div class="dept-view">View Details →</div></div>
+        <div class="dept-card" onclick="openDept(\'infrastructure\')"><div class="dept-icon" style="background:#fdeaed;">🛣️</div><h4>Dept. of Infrastructure</h4><p>Roads, bridges, housing construction, and national infrastructure.</p><div class="dept-view">View Details →</div></div>
+        <div class="dept-card" onclick="openDept(\'education\')"><div class="dept-icon" style="background:#fffbe6;">📚</div><h4>Dept. of Education</h4><p>Schools, universities, teacher training, and curriculum oversight.</p><div class="dept-view">View Details →</div></div>
+        <div class="dept-card" onclick="openDept(\'environment\')"><div class="dept-icon" style="background:#eaf6ef;">🌿</div><h4>Dept. of the Environment</h4><p>Conservation, climate action, natural resources, and regulation.</p><div class="dept-view">View Details →</div></div>
+        <div class="dept-card" onclick="openDept(\'justice\')"><div class="dept-icon" style="background:#fdeaed;">⚖️</div><h4>Dept. of Justice</h4><p>Courts, legal aid, prisons, anti-corruption, and rule of law.</p><div class="dept-view">View Details →</div></div>
+        <div class="dept-card" onclick="openDept(\'foreign\')"><div class="dept-icon" style="background:#fffbe6;">🌐</div><h4>Dept. of Foreign Affairs</h4><p>Diplomatic relations, embassies, trade, and consular services.</p><div class="dept-view">View Details →</div></div>
+        <div class="dept-card" onclick="openDept(\'transport\')"><div class="dept-icon" style="background:#eaf6ef;">🚌</div><h4>Dept. of Transport</h4><p>Public transit, aviation, rail, ports, and transport licensing.</p><div class="dept-view">View Details →</div></div>
+        <div class="dept-card" onclick="openDept(\'housing\')"><div class="dept-icon" style="background:#fdeaed;">🏘️</div><h4>Dept. of Housing</h4><p>Affordable housing, land reform, and urban development programs.</p><div class="dept-view">View Details →</div></div>
+        <div class="dept-card" onclick="openDept(\'commerce\')"><div class="dept-icon" style="background:#fffbe6;">💼</div><h4>Dept. of Commerce</h4><p>Trade, business licensing, investment, and economic development.</p><div class="dept-view">View Details →</div></div>
+        <div class="dept-card" onclick="openDept(\'social\')"><div class="dept-icon" style="background:#eaf6ef;">🤝</div><h4>Dept. of Social Development</h4><p>Social grants, child welfare, disability services, and community programs.</p><div class="dept-view">View Details →</div></div>
+        <div class="dept-card" onclick="openDept(\'defence\')"><div class="dept-icon" style="background:#fdeaed;">🛡️</div><h4>Dept. of Defence</h4><p>National defence, armed forces, and security policy.</p><div class="dept-view">View Details →</div></div>
+        <div class="dept-card" onclick="openDept(\'homeaffairs\')"><div class="dept-icon" style="background:#fffbe6;">🛂</div><h4>Dept. of Home Affairs</h4><p>Passports, national ID, immigration, citizenship, and borders.</p><div class="dept-view">View Details →</div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- DEPT PANEL -->
+<div class="dept-panel" id="deptPanel">
+  <div class="dept-panel-inner">
+    <div class="dp-header">
+      <div><h2 id="dpTitle">Department Name</h2><p id="dpSubtitle">Government of Amplon</p></div>
+      <button class="dp-close" onclick="closeDeptPanel()">×</button>
+    </div>
+    <div class="dp-body" id="dpBody"></div>
+  </div>
+</div>
+
+<!-- ═══ BUDGET ═══ -->
+<div class="page" id="page-budget">
+  <section class="sec">
+    <div class="container">
+      <span class="sec-label">Public Finance</span>
+      <h2 class="sec-title">Budget &amp; Finance</h2>
+      <p class="sec-sub editable" contenteditable="false">National budget allocation by department and county for the 2025–26 financial year. Click cells to edit in Admin Mode.</p>
+      <div class="budget-tabs">
+        <button class="btab active" onclick="showBudget(\'national\',this)">National Budget</button>
+        <button class="btab" onclick="showBudget(\'counties\',this)">County Budgets</button>
+        <button class="btab" onclick="showBudget(\'charts\',this)">Infographics</button>
+      </div>
+      <div class="budget-panel active" id="bp-national">
+        <div class="chart-wrap" style="margin-bottom:24px;"><h3>National Budget Overview — A$12.4 Billion FY2025–26</h3><canvas id="chartNational" height="80"></canvas></div>
+        <table class="budget-table" id="budgetNatTable">
+          <thead><tr><th>Department</th><th>Allocation (A$ Million)</th><th>% of Total</th><th>Change vs Last Year</th></tr></thead>
+          <tbody>
+            <tr><td>Office of the Prime Minister</td><td class="editable" contenteditable="false">142</td><td>1.1%</td><td>+2.1%</td></tr>
+            <tr><td>Department of Finance</td><td class="editable" contenteditable="false">280</td><td>2.3%</td><td>+0.5%</td></tr>
+            <tr><td>Department of Health</td><td class="editable" contenteditable="false">2,840</td><td>22.9%</td><td>+8.2%</td></tr>
+            <tr><td>Department of Education</td><td class="editable" contenteditable="false">2,200</td><td>17.7%</td><td>+5.1%</td></tr>
+            <tr><td>Department of Infrastructure</td><td class="editable" contenteditable="false">1,600</td><td>12.9%</td><td>+12.0%</td></tr>
+            <tr><td>Department of Social Development</td><td class="editable" contenteditable="false">1,800</td><td>14.5%</td><td>+6.3%</td></tr>
+            <tr><td>Department of Defence</td><td class="editable" contenteditable="false">850</td><td>6.9%</td><td>+1.2%</td></tr>
+            <tr><td>Department of Justice</td><td class="editable" contenteditable="false">620</td><td>5.0%</td><td>+3.8%</td></tr>
+            <tr><td>Department of Transport</td><td class="editable" contenteditable="false">480</td><td>3.9%</td><td>+7.5%</td></tr>
+            <tr><td>Department of Housing</td><td class="editable" contenteditable="false">520</td><td>4.2%</td><td>+15.0%</td></tr>
+            <tr><td>Department of Commerce</td><td class="editable" contenteditable="false">310</td><td>2.5%</td><td>+4.0%</td></tr>
+            <tr><td>Department of Environment</td><td class="editable" contenteditable="false">280</td><td>2.3%</td><td>+18.0%</td></tr>
+            <tr><td>Department of Foreign Affairs</td><td class="editable" contenteditable="false">190</td><td>1.5%</td><td>+0.8%</td></tr>
+            <tr><td>Department of Home Affairs</td><td class="editable" contenteditable="false">288</td><td>2.3%</td><td>+3.0%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="budget-panel" id="bp-counties">
+        <div class="chart-wrap" style="margin-bottom:24px;"><h3>County Budget Allocation — A$1.2 Billion Local Government Fund</h3><canvas id="chartCounty" height="80"></canvas></div>
+        <table class="budget-table" id="budgetCountyTable">
+          <thead><tr><th>County</th><th>Population Est.</th><th>Allocation (A$ Million)</th><th>Per Capita (A$)</th><th>Key Priority</th></tr></thead>
+          <tbody>
+            <tr><td>🏴 Kildare</td><td class="editable" contenteditable="false">222,500</td><td class="editable" contenteditable="false">118</td><td>530</td><td class="editable" contenteditable="false">Infrastructure &amp; Transport</td></tr>
+            <tr><td>🏴 Donegal</td><td class="editable" contenteditable="false">168,000</td><td class="editable" contenteditable="false">102</td><td>607</td><td class="editable" contenteditable="false">Rural Development</td></tr>
+            <tr><td>🏴 Mayo</td><td class="editable" contenteditable="false">130,000</td><td class="editable" contenteditable="false">88</td><td>677</td><td class="editable" contenteditable="false">Agriculture &amp; Tourism</td></tr>
+            <tr><td>🏴 Kilkenny</td><td class="editable" contenteditable="false">99,000</td><td class="editable" contenteditable="false">74</td><td>747</td><td class="editable" contenteditable="false">Heritage &amp; Tourism</td></tr>
+            <tr><td>🏴 Limerick</td><td class="editable" contenteditable="false">194,000</td><td class="editable" contenteditable="false">112</td><td>577</td><td class="editable" contenteditable="false">Urban Renewal</td></tr>
+            <tr><td>🏴 Wicklow</td><td class="editable" contenteditable="false">142,000</td><td class="editable" contenteditable="false">90</td><td>634</td><td class="editable" contenteditable="false">Environment &amp; Recreation</td></tr>
+            <tr><td>🏴 Wexford</td><td class="editable" contenteditable="false">149,000</td><td class="editable" contenteditable="false">94</td><td>631</td><td class="editable" contenteditable="false">Coastal Infrastructure</td></tr>
+            <tr><td>🏴 Cork</td><td class="editable" contenteditable="false">542,000</td><td class="editable" contenteditable="false">248</td><td>457</td><td class="editable" contenteditable="false">Industry &amp; Housing</td></tr>
+            <tr><td>🏴 Galway</td><td class="editable" contenteditable="false">258,000</td><td class="editable" contenteditable="false">174</td><td>674</td><td class="editable" contenteditable="false">Education &amp; Arts</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="budget-panel" id="bp-charts">
+        <div class="grid2">
+          <div class="chart-wrap"><h3>Departmental Spending Distribution</h3><canvas id="chartPie"></canvas></div>
+          <div class="chart-wrap"><h3>County Budget Comparison (A$ Million)</h3><canvas id="chartBar2"></canvas></div>
+        </div>
+        <div class="chart-wrap"><h3>Year-on-Year Budget Growth by Department</h3><canvas id="chartGrowth" height="70"></canvas></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ LOCAL GOVERNMENT ═══ -->
+<div class="page" id="page-localgov">
+  <section class="sec sec-alt">
+    <div class="container">
+      <span class="sec-label">Local Government</span>
+      <h2 class="sec-title">Counties of Amplon</h2>
+      <p class="sec-sub editable" contenteditable="false">Select a county to view local council information, key dates, government buildings, and contact details.</p>
+      <div class="county-tabs" id="countyTabs">
+        <button class="ctab active" onclick="showCounty(\'kildare\',this)">Co. Kildare</button>
+        <button class="ctab" onclick="showCounty(\'donegal\',this)">Co. Donegal</button>
+        <button class="ctab" onclick="showCounty(\'mayo\',this)">Co. Mayo</button>
+        <button class="ctab" onclick="showCounty(\'kilkenny\',this)">Co. Kilkenny</button>
+        <button class="ctab" onclick="showCounty(\'limerick\',this)">Co. Limerick</button>
+        <button class="ctab" onclick="showCounty(\'wicklow\',this)">Co. Wicklow</button>
+        <button class="ctab" onclick="showCounty(\'wexford\',this)">Co. Wexford</button>
+        <button class="ctab" onclick="showCounty(\'cork\',this)">Co. Cork</button>
+        <button class="ctab" onclick="showCounty(\'galway\',this)">Co. Galway</button>
+      </div>
+      <div id="countyPanels"></div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ CURRENT GOVERNMENT ═══ -->
+<div class="page" id="page-government">
+  <section class="sec">
+    <div class="container">
+      <span class="sec-label">State Leadership</span>
+      <h2 class="sec-title">Current Government of Amplon</h2>
+      <p class="sec-sub editable" contenteditable="false">The organisational structure of the Government of Amplon. Click names to edit in Admin Mode.</p>
+      <div class="org-chart" id="orgChart"></div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ EMBASSIES ═══ -->
+<div class="page" id="page-embassies">
+  <section class="sec sec-alt">
+    <div class="container">
+      <span class="sec-label">International Relations</span>
+      <h2 class="sec-title">Amplon Embassies &amp; High Commissions <button class="adm-add" onclick="openMo(\'moAddEmb\')">＋ Add</button></h2>
+      <p class="sec-sub editable" contenteditable="false">Amplon maintains diplomatic missions in the following countries. Contact your nearest embassy for consular services.</p>
+      <div class="emb-grid" id="embGrid">
+        <div class="emb-card" style="position:relative;"><button class="adm-del" onclick="this.closest(\'.emb-card\').remove()">✕</button><div class="emb-flag">🇬🇧</div><div class="emb-type">High Commission</div><h4 class="editable" contenteditable="false">Amplon High Commission — United Kingdom</h4><p class="editable" contenteditable="false">14 Belgrave Square, London, SW1X 8PW, United Kingdom</p><div class="emb-contact"><strong>Tel:</strong> <span class="editable" contenteditable="false">+44 20 7235 4800</span> | <strong>Email:</strong> <span class="editable" contenteditable="false">london@amplon.gov</span></div></div>
+        <div class="emb-card" style="position:relative;"><button class="adm-del" onclick="this.closest(\'.emb-card\').remove()">✕</button><div class="emb-flag">🇺🇸</div><div class="emb-type">Embassy</div><h4 class="editable" contenteditable="false">Embassy of Amplon — United States</h4><p class="editable" contenteditable="false">2220 Massachusetts Ave NW, Washington DC 20008, USA</p><div class="emb-contact"><strong>Tel:</strong> <span class="editable" contenteditable="false">+1 202 555 0180</span> | <strong>Email:</strong> <span class="editable" contenteditable="false">washington@amplon.gov</span></div></div>
+        <div class="emb-card" style="position:relative;"><button class="adm-del" onclick="this.closest(\'.emb-card\').remove()">✕</button><div class="emb-flag">🇧🇪</div><div class="emb-type">Embassy / EU Mission</div><h4 class="editable" contenteditable="false">Embassy of Amplon — Belgium &amp; EU</h4><p class="editable" contenteditable="false">Avenue des Arts 41, 1040 Brussels, Belgium</p><div class="emb-contact"><strong>Tel:</strong> <span class="editable" contenteditable="false">+32 2 555 0100</span> | <strong>Email:</strong> <span class="editable" contenteditable="false">brussels@amplon.gov</span></div></div>
+        <div class="emb-card" style="position:relative;"><button class="adm-del" onclick="this.closest(\'.emb-card\').remove()">✕</button><div class="emb-flag">🇫🇷</div><div class="emb-type">Embassy</div><h4 class="editable" contenteditable="false">Embassy of Amplon — France</h4><p class="editable" contenteditable="false">12 Rue de Varenne, 75007 Paris, France</p><div class="emb-contact"><strong>Tel:</strong> <span class="editable" contenteditable="false">+33 1 55 00 00 00</span> | <strong>Email:</strong> <span class="editable" contenteditable="false">paris@amplon.gov</span></div></div>
+        <div class="emb-card" style="position:relative;"><button class="adm-del" onclick="this.closest(\'.emb-card\').remove()">✕</button><div class="emb-flag">🇩🇪</div><div class="emb-type">Embassy</div><h4 class="editable" contenteditable="false">Embassy of Amplon — Germany</h4><p class="editable" contenteditable="false">Wallstraße 76–79, 10179 Berlin, Germany</p><div class="emb-contact"><strong>Tel:</strong> <span class="editable" contenteditable="false">+49 30 555 0200</span> | <strong>Email:</strong> <span class="editable" contenteditable="false">berlin@amplon.gov</span></div></div>
+        <div class="emb-card" style="position:relative;"><button class="adm-del" onclick="this.closest(\'.emb-card\').remove()">✕</button><div class="emb-flag">🇨🇳</div><div class="emb-type">Embassy</div><h4 class="editable" contenteditable="false">Embassy of Amplon — China</h4><p class="editable" contenteditable="false">No. 3 Dong Zhi Men Wai St, Chaoyang District, Beijing</p><div class="emb-contact"><strong>Tel:</strong> <span class="editable" contenteditable="false">+86 10 555 0300</span> | <strong>Email:</strong> <span class="editable" contenteditable="false">beijing@amplon.gov</span></div></div>
+        <div class="emb-card" style="position:relative;"><button class="adm-del" onclick="this.closest(\'.emb-card\').remove()">✕</button><div class="emb-flag">🇦🇺</div><div class="emb-type">High Commission</div><h4 class="editable" contenteditable="false">Amplon High Commission — Australia</h4><p class="editable" contenteditable="false">Commonwealth Avenue, Canberra ACT 2600, Australia</p><div class="emb-contact"><strong>Tel:</strong> <span class="editable" contenteditable="false">+61 2 555 0400</span> | <strong>Email:</strong> <span class="editable" contenteditable="false">canberra@amplon.gov</span></div></div>
+        <div class="emb-card" style="position:relative;"><button class="adm-del" onclick="this.closest(\'.emb-card\').remove()">✕</button><div class="emb-flag">🇺🇳</div><div class="emb-type">Permanent Mission</div><h4 class="editable" contenteditable="false">Amplon — United Nations, New York</h4><p class="editable" contenteditable="false">866 United Nations Plaza, New York, NY 10017, USA</p><div class="emb-contact"><strong>Tel:</strong> <span class="editable" contenteditable="false">+1 212 555 0500</span> | <strong>Email:</strong> <span class="editable" contenteditable="false">un-ny@amplon.gov</span></div></div>
+        <div class="emb-card" style="position:relative;"><button class="adm-del" onclick="this.closest(\'.emb-card\').remove()">✕</button><div class="emb-flag">🇮🇪</div><div class="emb-type">Embassy</div><h4 class="editable" contenteditable="false">Embassy of Amplon — Ireland</h4><p class="editable" contenteditable="false">17 Merrion Square, Dublin 2, Ireland, D02 XP20</p><div class="emb-contact"><strong>Tel:</strong> <span class="editable" contenteditable="false">+353 1 555 0600</span> | <strong>Email:</strong> <span class="editable" contenteditable="false">dublin@amplon.gov</span></div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ MAP ═══ -->
+<div class="page" id="page-map">
+  <section class="sec">
+    <div class="container">
+      <span class="sec-label">Geography</span>
+      <h2 class="sec-title">Map of Amplon</h2>
+      <p class="sec-sub editable" contenteditable="false">Official map of the Republic of Amplon showing counties, government buildings, and major infrastructure.</p>
+      <div id="mapDrop" class="map-drop" onclick="document.getElementById(\'mapInput\').click()">
+        <div id="mapPlaceholder">
+          <div style="font-size:48px;margin-bottom:12px;">🗺️</div>
+          <h3 style="font-family:var(--font-serif);color:var(--green);font-size:20px;margin-bottom:8px;">Upload Map of Amplon</h3>
+          <p style="font-size:14px;color:var(--text-muted);">Click to upload a PNG, JPG, or SVG image of the map.</p>
+        </div>
+        <img id="mapImg" src="" alt="Map of Amplon" style="display:none;width:100%;border-radius:var(--rl);box-shadow:var(--shl);"/>
+      </div>
+      <input type="file" id="mapInput" accept="image/*" style="display:none;" onchange="loadMap(event)"/>
+      <div style="margin-top:14px;display:flex;gap:10px;justify-content:center;" id="mapControls">
+        <button class="btn btn-outline" onclick="document.getElementById(\'mapInput\').click()">📁 Upload Image</button>
+        <button class="btn btn-outline" onclick="clearMap()">🗑 Clear Map</button>
+      </div>
+      <div style="margin-top:24px;" class="card">
+        <h3 style="font-family:var(--font-serif);color:var(--green);font-size:16px;margin-bottom:10px;">📍 Key Locations</h3>
+        <div class="grid3" style="gap:12px;">
+          <div style="font-size:13px;"><strong class="editable" contenteditable="false">Capital City</strong><br><span class="editable" contenteditable="false" style="color:var(--text-muted);">Amplon City — Seat of Government</span></div>
+          <div style="font-size:13px;"><strong class="editable" contenteditable="false">Parliament House</strong><br><span class="editable" contenteditable="false" style="color:var(--text-muted);">Central District, Amplon City</span></div>
+          <div style="font-size:13px;"><strong class="editable" contenteditable="false">Presidential Palace</strong><br><span class="editable" contenteditable="false" style="color:var(--text-muted);">Government Quarter, Capital</span></div>
+          <div style="font-size:13px;"><strong class="editable" contenteditable="false">Supreme Court</strong><br><span class="editable" contenteditable="false" style="color:var(--text-muted);">Justice Avenue, Capital</span></div>
+          <div style="font-size:13px;"><strong class="editable" contenteditable="false">Main Port</strong><br><span class="editable" contenteditable="false" style="color:var(--text-muted);">Harbour District</span></div>
+          <div style="font-size:13px;"><strong class="editable" contenteditable="false">International Airport</strong><br><span class="editable" contenteditable="false" style="color:var(--text-muted);">Amplon International, 12km from capital</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ CONTACT ═══ -->
+<div class="page" id="page-contact">
+  <section class="sec sec-alt">
+    <div class="container">
+      <span class="sec-label">Reach Us</span>
+      <h2 class="sec-title">Contact &amp; Government Buildings</h2>
+      <p class="sec-sub editable" contenteditable="false">Find government buildings, contact numbers, and office hours for each county of Amplon.</p>
+      <div class="grid2" style="gap:28px;margin-bottom:32px;align-items:start;">
+        <div class="card">
+          <h3 style="font-family:var(--font-serif);color:var(--green);font-size:18px;margin-bottom:16px;">🏛 Central Government Offices</h3>
+          <div class="ev-item"><div class="ev-dot"></div><div><p style="font-weight:600;" class="editable" contenteditable="false">Office of the Prime Minister</p><span class="editable" contenteditable="false">Government Buildings, Upper Merrion Street, Amplon City<br>Tel: +000 1 619 4000 | pm@gov.amp</span></div></div>
+          <div class="ev-item"><div class="ev-dot"></div><div><p style="font-weight:600;" class="editable" contenteditable="false">Parliament House</p><span class="editable" contenteditable="false">Kildare Street, Amplon City | Tel: +000 1 618 3000</span></div></div>
+          <div class="ev-item"><div class="ev-dot"></div><div><p style="font-weight:600;" class="editable" contenteditable="false">Dept. of Finance</p><span class="editable" contenteditable="false">Government Buildings, Upper Merrion Street | Tel: +000 1 676 7571</span></div></div>
+          <div class="ev-item"><div class="ev-dot"></div><div><p style="font-weight:600;" class="editable" contenteditable="false">Citizens Hotline</p><span style="font-size:15px;font-weight:700;color:var(--green);" class="editable" contenteditable="false">0800 GOV AMP</span></div></div>
+        </div>
+        <div class="card">
+          <h3 style="font-family:var(--font-serif);color:var(--green);font-size:18px;margin-bottom:14px;">📬 General Enquiries</h3>
+          <div class="fg"><label>Your Name</label><input type="text" placeholder="Full Name"/></div>
+          <div class="fg"><label>Email Address</label><input type="email" placeholder="email@example.com"/></div>
+          <div class="fg"><label>Subject</label><input type="text" placeholder="Enquiry subject"/></div>
+          <div class="fg"><label>Message</label><textarea placeholder="Your message to the Government of Amplon…"></textarea></div>
+          <button class="btn-sub" style="width:100%;">Send Enquiry</button>
+        </div>
+      </div>
+      <h3 style="font-family:var(--font-serif);color:var(--green);font-size:22px;margin-bottom:20px;">🏢 Government Buildings by County</h3>
+      <div class="contact-county-list">
+        <div class="contact-county-card"><h4>Co. Kildare</h4><p class="editable" contenteditable="false"><strong>Kildare County Council</strong><br>Áras Chill Dara, Devoy Park, Naas<br>📞 <span>045 980 200</span><br>📧 info@kildarecoco.ie<br>🕘 Mon–Fri: 9:00–17:00</p></div>
+        <div class="contact-county-card"><h4>Co. Donegal</h4><p class="editable" contenteditable="false"><strong>Donegal County Council</strong><br>County House, The Diamond, Lifford<br>📞 074 916 4900<br>📧 info@donegalcoco.ie<br>🕘 Mon–Fri: 9:00–17:00</p></div>
+        <div class="contact-county-card"><h4>Co. Mayo</h4><p class="editable" contenteditable="false"><strong>Mayo County Council</strong><br>Áras an Chontae, Castlebar<br>📞 094 902 4444<br>📧 info@mayococo.ie<br>🕘 Mon–Fri: 9:00–17:00</p></div>
+        <div class="contact-county-card"><h4>Co. Kilkenny</h4><p class="editable" contenteditable="false"><strong>Kilkenny County Council</strong><br>County Hall, John Street, Kilkenny<br>📞 056 779 4000<br>📧 info@kilkennycoco.ie<br>🕘 Mon–Fri: 9:00–17:00</p></div>
+        <div class="contact-county-card"><h4>Co. Limerick</h4><p class="editable" contenteditable="false"><strong>Limerick City &amp; County Council</strong><br>Merchants Quay, Limerick<br>📞 061 556 000<br>📧 info@limerick.ie<br>🕘 Mon–Fri: 9:00–17:00</p></div>
+        <div class="contact-county-card"><h4>Co. Wicklow</h4><p class="editable" contenteditable="false"><strong>Wicklow County Council</strong><br>County Buildings, Wicklow Town<br>📞 0404 20100<br>📧 info@wicklowcoco.ie<br>🕘 Mon–Fri: 9:00–17:00</p></div>
+        <div class="contact-county-card"><h4>Co. Wexford</h4><p class="editable" contenteditable="false"><strong>Wexford County Council</strong><br>County Hall, Spawell Road, Wexford<br>📞 053 919 6000<br>📧 info@wexfordcoco.ie<br>🕘 Mon–Fri: 9:00–17:00</p></div>
+        <div class="contact-county-card"><h4>Co. Cork</h4><p class="editable" contenteditable="false"><strong>Cork County Council</strong><br>County Hall, Carrigrohane Road, Cork<br>📞 021 434 6100<br>📧 info@corkcoco.ie<br>🕘 Mon–Fri: 9:00–17:00</p></div>
+        <div class="contact-county-card"><h4>Co. Galway</h4><p class="editable" contenteditable="false"><strong>Galway County Council</strong><br>County Buildings, Prospect Hill, Galway<br>📞 091 509 000<br>📧 info@galwaycoco.ie<br>🕘 Mon–Fri: 9:00–17:00</p></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="ft-tri"></div>
+    <div class="ft-grid">
+      <div class="ft-brand"><h2>Government of Amplon</h2><p>Official national government portal serving all citizens with transparency, accountability, and efficient public service.</p><p style="margin-top:10px;font-size:11px;">📍 <span class="editable" contenteditable="false">Government Buildings, Amplon City</span><br>📞 <span class="editable" contenteditable="false">0800 GOV AMP</span> | ✉️ <span class="editable" contenteditable="false">info@gov.amp</span></p></div>
+      <div class="ft-col"><h3>Services</h3><ul><li><a href="#" onclick="showPage(\'forms\')">Pay Taxes Online</a></li><li><a href="#" onclick="openForm(\'passport\')">Apply for Passport</a></li><li><a href="#" onclick="openForm(\'complaint\')">Report an Issue</a></li><li><a href="#" onclick="openForm(\'voter\')">Register to Vote</a></li><li><a href="#" onclick="openForm(\'business\')">Business Registration</a></li></ul></div>
+      <div class="ft-col"><h3>Government</h3><ul><li><a href="#" onclick="showPage(\'parliament\')">Parliament</a></li><li><a href="#" onclick="showPage(\'government\')">Cabinet</a></li><li><a href="#" onclick="showPage(\'departments\')">All Departments</a></li><li><a href="#" onclick="showPage(\'budget\')">Budget</a></li><li><a href="#" onclick="showPage(\'embassies\')">Embassies</a></li></ul></div>
+      <div class="ft-col"><h3>Information</h3><ul><li><a href="#">Accessibility</a></li><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Use</a></li><li><a href="#">Sitemap</a></li><li><a href="#" onclick="showPage(\'contact\')">Contact Us</a></li></ul></div>
+    </div>
+    <div class="ft-bottom"><span>© 2025 Government of Amplon. All rights reserved.</span><span style="display:flex;align-items:center;gap:6px;"><span style="width:14px;height:9px;background:var(--red);border-radius:2px;display:inline-block;"></span><span style="width:14px;height:9px;background:#fff;border-radius:2px;display:inline-block;border:1px solid rgba(255,255,255,.2);"></span><span style="width:14px;height:9px;background:var(--yellow);border-radius:2px;display:inline-block;"></span></span></div>
+  </div>
+</footer>
+
+<!-- ════ MODALS ════ -->
+
+<!-- FORM MODAL -->
+<div class="mo" id="moForm">
+  <div class="mo-box">
+    <div class="mo-hdr"><div><div class="ybar"></div><h3 id="moFormTitle"></h3><p id="moFormSub"></p></div><button class="mo-x" onclick="closeMo(\'moForm\')">×</button></div>
+    <div class="mo-body" id="moFormBody"></div>
+    <div class="mo-foot" id="moFormFoot"><button class="btn-ghost" onclick="closeMo(\'moForm\')">Cancel</button><button class="btn-sub" onclick="submitForm()">Submit →</button></div>
+  </div>
+</div>
+
+<!-- ADD NEWS -->
+<div class="mo" id="moNews">
+  <div class="mo-box">
+    <div class="mo-hdr"><div><div class="ybar"></div><h3>📰 Add Announcement</h3><p>Published to the public announcements section immediately.</p></div><button class="mo-x" onclick="closeMo(\'moNews\')">×</button></div>
+    <div class="mo-body">
+      <div class="fg"><label>Category</label><div class="tag-opts" id="tagOpts"><button class="topt" data-tag="notice" onclick="selTag(this)">📋 Notice</button><button class="topt" data-tag="urgent" onclick="selTag(this)">🚨 Urgent</button><button class="topt" data-tag="event" onclick="selTag(this)">🎪 Event</button><button class="topt" data-tag="tender" onclick="selTag(this)">📄 Tender</button></div></div>
+      <div class="frow"><div class="fg"><label>Month <span class="req">*</span></label><input type="text" id="nMonth" placeholder="May"/></div><div class="fg"><label>Day <span class="req">*</span></label><input type="number" id="nDay" placeholder="10" min="1" max="31"/></div></div>
+      <div class="fg"><label>Headline <span class="req">*</span></label><input type="text" id="nTitle" placeholder="Announcement headline…"/></div>
+      <div class="fg"><label>Body Text <span class="req">*</span></label><textarea id="nBody" placeholder="Full announcement text…"></textarea></div>
+      <div class="fg"><label>Link Text (optional)</label><input type="text" id="nLink" placeholder="Read full notice →"/></div>
+      <div class="fg"><label>Feature at top?</label><select id="nFeat"><option value="no">Standard listing</option><option value="yes">Featured (yellow border)</option></select></div>
+    </div>
+    <div class="mo-foot"><button class="btn-ghost" onclick="closeMo(\'moNews\')">Cancel</button><button class="btn-sub" onclick="publishNews()">Publish →</button></div>
+  </div>
+</div>
+
+<!-- ADD FORM CARD -->
+<div class="mo" id="moAddForm">
+  <div class="mo-box">
+    <div class="mo-hdr"><div><div class="ybar"></div><h3>➕ Add Service Form</h3><p>Adds a new card to the Forms & Applications section.</p></div><button class="mo-x" onclick="closeMo(\'moAddForm\')">×</button></div>
+    <div class="mo-body">
+      <div class="frow"><div class="fg"><label>Icon (emoji) <span class="req">*</span></label><input type="text" id="afIcon" placeholder="📋" maxlength="4"/></div><div class="fg"><label>Form Title <span class="req">*</span></label><input type="text" id="afTitle" placeholder="Land Title Application"/></div></div>
+      <div class="fg"><label>Description <span class="req">*</span></label><textarea id="afDesc" placeholder="Brief description…"></textarea></div>
+      <div class="frow"><div class="fg"><label>Department <span class="req">*</span></label><input type="text" id="afDept" placeholder="Dept. of Lands"/></div><div class="fg"><label>Processing Time <span class="req">*</span></label><input type="text" id="afTime" placeholder="7–10 days"/></div></div>
+    </div>
+    <div class="mo-foot"><button class="btn-ghost" onclick="closeMo(\'moAddForm\')">Cancel</button><button class="btn-sub" onclick="addFormCard()">Add Card →</button></div>
+  </div>
+</div>
+
+<!-- ADD PARLIAMENT DATE -->
+<div class="mo" id="moAddParl">
+  <div class="mo-box" style="max-width:500px;">
+    <div class="mo-hdr"><div><div class="ybar"></div><h3>📅 Add Parliamentary Date</h3><p>Add an important date to the parliamentary calendar.</p></div><button class="mo-x" onclick="closeMo(\'moAddParl\')">×</button></div>
+    <div class="mo-body">
+      <div class="frow"><div class="fg"><label>Month <span class="req">*</span></label><input type="text" id="pdMonth" placeholder="Jun"/></div><div class="fg"><label>Day <span class="req">*</span></label><input type="number" id="pdDay" placeholder="15" min="1" max="31"/></div></div>
+      <div class="fg"><label>Event Title <span class="req">*</span></label><input type="text" id="pdTitle" placeholder="e.g. Third Reading — Finance Bill"/></div>
+      <div class="fg"><label>Details</label><textarea id="pdDetails" placeholder="Location, time, chamber, committee…" style="min-height:70px;"></textarea></div>
+    </div>
+    <div class="mo-foot"><button class="btn-ghost" onclick="closeMo(\'moAddParl\')">Cancel</button><button class="btn-sub" onclick="addParlDate()">Add to Calendar →</button></div>
+  </div>
+</div>
+
+<!-- SUBMISSIONS -->
+<div class="mo" id="moSubs">
+  <div class="mo-box">
+    <div class="mo-hdr"><div><div class="ybar"></div><h3>📋 Form Submissions</h3><p>All submissions received through the portal.</p></div><button class="mo-x" onclick="closeMo(\'moSubs\')">×</button></div>
+    <div class="mo-body">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><span style="font-size:13px;color:var(--text-muted);" id="subCount">0 submissions</span><button class="btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="clearSubs()">Clear All</button></div>
+      <div class="sub-list" id="subList"></div>
+    </div>
+    <div class="mo-foot"><button class="btn-sub" onclick="closeMo(\'moSubs\')">Close</button></div>
+  </div>
+</div>
+
+<!-- EDIT STATS -->
+<div class="mo" id="moEditStats">
+  <div class="mo-box" style="max-width:420px;">
+    <div class="mo-hdr"><div><div class="ybar"></div><h3>📊 Edit Statistics</h3></div><button class="mo-x" onclick="closeMo(\'moEditStats\')">×</button></div>
+    <div class="mo-body">
+      <div class="fg"><label>Citizens of Amplon</label><input type="text" id="si0" /></div>
+      <div class="fg"><label>Government Departments</label><input type="text" id="si1" /></div>
+      <div class="fg"><label>Requests Resolved Rate</label><input type="text" id="si2" /></div>
+      <div class="fg"><label>Forms This Month</label><input type="text" id="si3" /></div>
+    </div>
+    <div class="mo-foot"><button class="btn-ghost" onclick="closeMo(\'moEditStats\')">Cancel</button><button class="btn-sub" onclick="saveStats()">Save →</button></div>
+  </div>
+</div>
+
+<!-- ADD EMBASSY -->
+<div class="mo" id="moAddEmb">
+  <div class="mo-box" style="max-width:520px;">
+    <div class="mo-hdr"><div><div class="ybar"></div><h3>🌍 Add Embassy / Mission</h3></div><button class="mo-x" onclick="closeMo(\'moAddEmb\')">×</button></div>
+    <div class="mo-body">
+      <div class="frow"><div class="fg"><label>Flag Emoji</label><input type="text" id="embFlag" placeholder="🇮🇪" maxlength="4"/></div><div class="fg"><label>Mission Type</label><input type="text" id="embType" placeholder="Embassy / High Commission"/></div></div>
+      <div class="fg"><label>Country / Title <span class="req">*</span></label><input type="text" id="embTitle" placeholder="Embassy of Amplon — Ireland"/></div>
+      <div class="fg"><label>Address <span class="req">*</span></label><textarea id="embAddr" placeholder="Full address…" style="min-height:60px;"></textarea></div>
+      <div class="frow"><div class="fg"><label>Phone</label><input type="text" id="embTel" placeholder="+353 1 555 0000"/></div><div class="fg"><label>Email</label><input type="text" id="embEmail" placeholder="dublin@amplon.gov"/></div></div>
+    </div>
+    <div class="mo-foot"><button class="btn-ghost" onclick="closeMo(\'moAddEmb\')">Cancel</button><button class="btn-sub" onclick="addEmbassy()">Add Mission →</button></div>
+  </div>
+</div>
+
+<!-- ADD DEPT -->
+<div class="mo" id="moAddDept">
+  <div class="mo-box" style="max-width:500px;">
+    <div class="mo-hdr"><div><div class="ybar"></div><h3>🏛 Add Department</h3></div><button class="mo-x" onclick="closeMo(\'moAddDept\')">×</button></div>
+    <div class="mo-body">
+      <div class="frow"><div class="fg"><label>Icon (emoji)</label><input type="text" id="ddIcon" placeholder="🏛️" maxlength="4"/></div><div class="fg"><label>Department Name <span class="req">*</span></label><input type="text" id="ddName" placeholder="Dept. of Agriculture"/></div></div>
+      <div class="fg"><label>Brief Description <span class="req">*</span></label><input type="text" id="ddDesc" placeholder="Short description…"/></div>
+      <div class="fg"><label>Secretary General</label><input type="text" id="ddSec" placeholder="Name of Secretary General"/></div>
+      <div class="fg"><label>Headquarters</label><input type="text" id="ddHQ" placeholder="Address of HQ"/></div>
+      <div class="fg"><label>Budget (A$ million)</label><input type="text" id="ddBudget" placeholder="e.g. 450"/></div>
+    </div>
+    <div class="mo-foot"><button class="btn-ghost" onclick="closeMo(\'moAddDept\')">Cancel</button><button class="btn-sub" onclick="addDept()">Add Department →</button></div>
+  </div>
+</div>
+
+<!-- ADD COUNTY DATE -->
+<div class="mo" id="moAddCountyDate">
+  <div class="mo-box" style="max-width:500px;">
+    <div class="mo-hdr"><div><div class="ybar"></div><h3>📅 Add County Date / Event</h3><p id="moCountyDateLbl"></p></div><button class="mo-x" onclick="closeMo(\'moAddCountyDate\')">×</button></div>
+    <div class="mo-body">
+      <input type="hidden" id="cdCounty"/>
+      <div class="frow"><div class="fg"><label>Date</label><input type="date" id="cdDate"/></div><div class="fg"><label>Category</label><select id="cdCat"><option>Council Meeting</option><option>Budget Session</option><option>Public Consultation</option><option>Election</option><option>Community Event</option><option>Other</option></select></div></div>
+      <div class="fg"><label>Event / Date Title <span class="req">*</span></label><input type="text" id="cdTitle" placeholder="e.g. Annual Budget Sitting"/></div>
+      <div class="fg"><label>Details (optional)</label><textarea id="cdDetails" placeholder="Location, time, notes…" style="min-height:60px;"></textarea></div>
+    </div>
+    <div class="mo-foot"><button class="btn-ghost" onclick="closeMo(\'moAddCountyDate\')">Cancel</button><button class="btn-sub" onclick="addCountyDate()">Add Date →</button></div>
+  </div>
+</div>
+
+<script>
+// ════ LOGO ════
+document.querySelector(\'.logo-img\').src = "LOGO_DATA_URI";
+
+// ════ STATE ════
+let adminMode = false;
+let submissions = JSON.parse(localStorage.getItem(\'amp_subs\') || \'[]\');
+let selTag = \'\';
+let activeDeptPanel = null;
+
+// ════ ADMIN ════
+function toggleAdmin() {
+  adminMode = !adminMode;
+  document.body.classList.toggle(\'admin\', adminMode);
+  const btn = document.getElementById(\'adminToggle\');
+  btn.textContent = adminMode ? \'✓ Exit Admin\' : \'⚙ Admin Mode\';
+  btn.classList.toggle(\'on\', adminMode);
+  document.querySelectorAll(\'.editable\').forEach(el => el.contentEditable = adminMode ? \'true\' : \'false\');
+}
+
+// ════ PAGE NAV ════
+function showPage(id) {
+  document.querySelectorAll(\'.page\').forEach(p => p.classList.remove(\'active\'));
+  document.querySelectorAll(\'.nav-inner button\').forEach(b => b.classList.remove(\'active\'));
+  document.getElementById(\'page-\' + id).classList.add(\'active\');
+  const nb = document.getElementById(\'nav-\' + id.replace(\'localgov\',\'local\').replace(\'announcements\',\'ann\').replace(\'parliament\',\'parl\').replace(\'departments\',\'dept\').replace(\'elections\',\'elec\').replace(\'government\',\'gov\').replace(\'embassies\',\'emb\').replace(\'contact\',\'contact\').replace(\'budget\',\'budget\').replace(\'forms\',\'forms\').replace(\'news\',\'news\').replace(\'map\',\'map\'));
+  if (nb) nb.classList.add(\'active\');
+  window.scrollTo(0,0);
+  if (id === \'budget\') initCharts();
+  if (id === \'home\') buildHomePreview();
+}
+
+// ════ MODALS ════
+function openMo(id) { document.getElementById(id).classList.add(\'open\'); document.body.style.overflow=\'hidden\';}
+function closeMo(id) { document.getElementById(id).classList.remove(\'open\'); document.body.style.overflow=\'\';}
+document.querySelectorAll(\'.mo\').forEach(m => m.addEventListener(\'click\', e => { if (e.target===m) closeMo(m.id); }));
+
+// ════ FORM SUBMISSIONS ════
+const formDefs = {
+  permit:{title:\'🏗️ Building & Construction Permit\',sub:\'Department of Infrastructure — 10–15 business days.\',fields:`<div class="f-success" id="fSuccess"></div><div class="frow"><div class="fg"><label>First Name <span class="req">*</span></label><input type="text"/></div><div class="fg"><label>Last Name <span class="req">*</span></label><input type="text"/></div></div><div class="frow"><div class="fg"><label>Email <span class="req">*</span></label><input type="email"/></div><div class="fg"><label>Phone <span class="req">*</span></label><input type="tel"/></div></div><div class="fg"><label>Property Address <span class="req">*</span></label><input type="text"/></div><div class="frow"><div class="fg"><label>Title Deed No. <span class="req">*</span></label><input type="text"/></div><div class="fg"><label>Permit Type <span class="req">*</span></label><select><option>New Construction</option><option>Renovation</option><option>Electrical</option><option>Plumbing</option><option>Demolition</option></select></div></div><div class="fg"><label>Est. Value (A$)</label><input type="number"/></div><div class="fg"><label>Description <span class="req">*</span></label><textarea></textarea></div>`},
+  business:{title:\'💼 Business Registration\',sub:\'Department of Commerce — 5–7 business days.\',fields:`<div class="f-success" id="fSuccess"></div><div class="frow"><div class="fg"><label>Business Name <span class="req">*</span></label><input type="text"/></div><div class="fg"><label>Type <span class="req">*</span></label><select><option>Sole Proprietor</option><option>Partnership</option><option>Private Company</option><option>Non-Profit</option></select></div></div><div class="fg"><label>Business Address <span class="req">*</span></label><input type="text"/></div><div class="frow"><div class="fg"><label>Owner Name <span class="req">*</span></label><input type="text"/></div><div class="fg"><label>National ID <span class="req">*</span></label><input type="text"/></div></div><div class="frow"><div class="fg"><label>Email <span class="req">*</span></label><input type="email"/></div><div class="fg"><label>Phone <span class="req">*</span></label><input type="tel"/></div></div><div class="fg"><label>Nature of Business <span class="req">*</span></label><textarea></textarea></div>`},
+  complaint:{title:\'📢 Public Complaint\',sub:\'Office of the Ombudsman — 3–5 business days.\',fields:`<div class="f-success" id="fSuccess"></div><div class="frow"><div class="fg"><label>Name (optional)</label><input type="text" placeholder="Anonymous accepted"/></div><div class="fg"><label>Email (optional)</label><input type="email"/></div></div><div class="fg"><label>Category <span class="req">*</span></label><select><option>Infrastructure</option><option>Government Services</option><option>Corruption</option><option>Public Health</option><option>Environmental</option><option>Other</option></select></div><div class="fg"><label>Location <span class="req">*</span></label><input type="text"/></div><div class="fg"><label>Description <span class="req">*</span></label><textarea></textarea></div><div class="fg"><label>Attach Evidence</label><input type="file" style="padding:6px;"/></div>`},
+  records:{title:\'📁 Freedom of Information Request\',sub:\'Department of Justice — 20 business days by law.\',fields:`<div class="f-notice"><span>⚖️</span><span>Processed under the Amplon Freedom of Information Act. Fee: A$5.</span></div><div class="f-success" id="fSuccess"></div><div class="frow"><div class="fg"><label>Full Name <span class="req">*</span></label><input type="text"/></div><div class="fg"><label>National ID <span class="req">*</span></label><input type="text"/></div></div><div class="frow"><div class="fg"><label>Email <span class="req">*</span></label><input type="email"/></div><div class="fg"><label>Phone</label><input type="tel"/></div></div><div class="fg"><label>Department <span class="req">*</span></label><select><option>Office of Prime Minister</option><option>Finance</option><option>Justice</option><option>Health</option><option>Infrastructure</option><option>Other</option></select></div><div class="fg"><label>Records Requested <span class="req">*</span></label><textarea></textarea></div>`},
+  voter:{title:\'🗳️ Voter Registration\',sub:\'Electoral Commission — 2–3 business days.\',fields:`<div class="f-success" id="fSuccess"></div><div class="frow"><div class="fg"><label>First Name <span class="req">*</span></label><input type="text"/></div><div class="fg"><label>Last Name <span class="req">*</span></label><input type="text"/></div></div><div class="frow"><div class="fg"><label>Date of Birth <span class="req">*</span></label><input type="date"/></div><div class="fg"><label>National ID <span class="req">*</span></label><input type="text"/></div></div><div class="fg"><label>Home Address <span class="req">*</span></label><input type="text"/></div><div class="frow"><div class="fg"><label>Province <span class="req">*</span></label><select><option>Northern Province</option><option>Southern Province</option><option>Eastern Province</option><option>Western Province</option><option>Capital District</option></select></div><div class="fg"><label>Constituency</label><input type="text" placeholder="If known"/></div></div>`},
+  passport:{title:\'🛂 Passport Application\',sub:\'Department of Home Affairs — 15–21 business days.\',fields:`<div class="f-success" id="fSuccess"></div><div class="frow"><div class="fg"><label>First Name <span class="req">*</span></label><input type="text"/></div><div class="fg"><label>Last Name <span class="req">*</span></label><input type="text"/></div></div><div class="frow"><div class="fg"><label>Date of Birth <span class="req">*</span></label><input type="date"/></div><div class="fg"><label>National ID <span class="req">*</span></label><input type="text"/></div></div><div class="fg"><label>Application Type <span class="req">*</span></label><select><option>New Passport</option><option>Renewal</option><option>Emergency</option></select></div><div class="fg"><label>Home Address <span class="req">*</span></label><input type="text"/></div><div class="frow"><div class="fg"><label>Email <span class="req">*</span></label><input type="email"/></div><div class="fg"><label>Phone <span class="req">*</span></label><input type="tel"/></div></div>`},
+  social:{title:\'🤝 Social Services Application\',sub:\'Department of Social Development — 10 business days.\',fields:`<div class="f-success" id="fSuccess"></div><div class="frow"><div class="fg"><label>Full Name <span class="req">*</span></label><input type="text"/></div><div class="fg"><label>Date of Birth <span class="req">*</span></label><input type="date"/></div></div><div class="fg"><label>Service Required <span class="req">*</span></label><select><option>Emergency Housing</option><option>Utility Subsidy</option><option>Food Security</option><option>Disability Grant</option><option>Child & Family Support</option><option>Elderly Care</option></select></div><div class="frow"><div class="fg"><label>Phone <span class="req">*</span></label><input type="tel"/></div><div class="fg"><label>Household Size</label><select><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select></div></div><div class="fg"><label>Monthly Income (A$)</label><input type="number"/></div>`},
+  employment:{title:\'👔 Government Employment\',sub:\'Public Service Commission — rolling basis.\',fields:`<div class="f-success" id="fSuccess"></div><div class="frow"><div class="fg"><label>First Name <span class="req">*</span></label><input type="text"/></div><div class="fg"><label>Last Name <span class="req">*</span></label><input type="text"/></div></div><div class="frow"><div class="fg"><label>Email <span class="req">*</span></label><input type="email"/></div><div class="fg"><label>Phone <span class="req">*</span></label><input type="tel"/></div></div><div class="fg"><label>Position <span class="req">*</span></label><select><option>Policy Analyst</option><option>Finance Officer</option><option>Health Inspector</option><option>Administrative Officer</option><option>Social Worker</option><option>IT Administrator</option><option>General Application</option></select></div><div class="fg"><label>Qualification</label><select><option>High School</option><option>Diploma</option><option>Bachelor\'s</option><option>Master\'s</option><option>Doctorate</option></select></div><div class="fg"><label>Cover Letter <span class="req">*</span></label><textarea></textarea></div>`},
+  event:{title:\'🎪 Special Event Permit\',sub:\'Department of Internal Affairs — 15 business days.\',fields:`<div class="f-success" id="fSuccess"></div><div class="frow"><div class="fg"><label>Organisation <span class="req">*</span></label><input type="text"/></div><div class="fg"><label>Contact Person <span class="req">*</span></label><input type="text"/></div></div><div class="frow"><div class="fg"><label>Email <span class="req">*</span></label><input type="email"/></div><div class="fg"><label>Phone <span class="req">*</span></label><input type="tel"/></div></div><div class="fg"><label>Event Name <span class="req">*</span></label><input type="text"/></div><div class="fg"><label>Event Type</label><select><option>Concert/Festival</option><option>Sports</option><option>Political Rally</option><option>Community Gathering</option><option>Parade/March</option><option>Film Shoot</option></select></div><div class="frow"><div class="fg"><label>Date <span class="req">*</span></label><input type="date"/></div><div class="fg"><label>Expected Attendance</label><input type="number"/></div></div><div class="fg"><label>Venue <span class="req">*</span></label><input type="text"/></div><div class="fg"><label>Description</label><textarea></textarea></div>`},
+  general:{title:\'📋 General Service Request\',sub:\'Government of Amplon — 10 business days.\',fields:`<div class="f-success" id="fSuccess"></div><div class="frow"><div class="fg"><label>Full Name <span class="req">*</span></label><input type="text"/></div><div class="fg"><label>National ID <span class="req">*</span></label><input type="text"/></div></div><div class="frow"><div class="fg"><label>Email <span class="req">*</span></label><input type="email"/></div><div class="fg"><label>Phone</label><input type="tel"/></div></div><div class="fg"><label>Request Details <span class="req">*</span></label><textarea></textarea></div>`}
+};
+function openForm(type) {
+  const f = formDefs[type] || formDefs.general;
+  document.getElementById(\'moFormTitle\').textContent = f.title;
+  document.getElementById(\'moFormSub\').textContent = f.sub;
+  document.getElementById(\'moFormBody\').innerHTML = f.fields;
+  document.getElementById(\'moFormFoot\').style.display = \'flex\';
+  openMo(\'moForm\');
+}
+function submitForm() {
+  const s = document.getElementById(\'fSuccess\');
+  if (!s) return;
+  const ref = \'AMP-\' + Date.now().toString().slice(-8);
+  const type = document.getElementById(\'moFormTitle\').textContent;
+  submissions.unshift({ref, type, date: new Date().toLocaleString()});
+  localStorage.setItem(\'amp_subs\', JSON.stringify(submissions));
+  s.innerHTML = \'<div class="si">✅</div><h4>Submitted Successfully!</h4><p>Reference: <strong>\' + ref + \'</strong>. Confirmation within 1 business day.</p>\';
+  s.style.display = \'block\';
+  document.getElementById(\'moFormFoot\').style.display = \'none\';
+  s.scrollIntoView({behavior:\'smooth\',block:\'nearest\'});
+}
+
+// ════ ANN ════
+let selTagVal = \'\';
+function selTag(btn) {
+  document.querySelectorAll(\'.topt\').forEach(t => t.className = \'topt\');
+  selTagVal = btn.dataset.tag;
+  btn.classList.add(\'sel-\' + selTagVal);
+}
+function publishNews() {
+  const title = document.getElementById(\'nTitle\').value.trim();
+  const body = document.getElementById(\'nBody\').value.trim();
+  const month = document.getElementById(\'nMonth\').value.trim() || \'May\';
+  const day = document.getElementById(\'nDay\').value.trim() || \'1\';
+  const link = document.getElementById(\'nLink\').value.trim();
+  const feat = document.getElementById(\'nFeat\').value === \'yes\';
+  const tag = selTagVal || \'notice\';
+  if (!title||!body) {alert(\'Please fill in headline and text.\');return;}
+  const tagLabels = {notice:\'📋 Notice\',urgent:\'🚨 Urgent\',event:\'🎪 Event\',tender:\'📄 Tender\'};
+  const card = document.createElement(\'div\');
+  card.className = \'ann-card\' + (feat?\' featured\':\'\');
+  card.innerHTML = \'<button class="adm-del" onclick="this.closest(\\\'.\'+\'ann-card\\\')\'+\'.remove()">✕</button><div class="ann-date"><div class="mo">\'+month+\'</div><div class="dy">\'+day+\'</div></div><div class="ann-body"><span class="ann-tag t-\'+tag+\'">\'+tagLabels[tag]+\'</span><h4 class="editable" contenteditable="\'+adminMode+\'">\'+title+\'</h4><p class="editable" contenteditable="\'+adminMode+\'">\'+body+\'</p>\'+(link?\'<a href="#" style="color:var(--red);font-size:13px;font-weight:600;display:inline-block;margin-top:6px;">\'+link+\'</a>\':\'\')+\'</div>\';
+  const list = document.getElementById(\'annList\');
+  list.insertBefore(card, list.querySelector(\'.ann-add-ph\'));
+  closeMo(\'moNews\');
+  buildHomePreview();
+}
+
+// ════ PARLIAMENT ════
+function addParlDate() {
+  const title = document.getElementById(\'pdTitle\').value.trim();
+  const month = document.getElementById(\'pdMonth\').value.trim() || \'Jun\';
+  const day = document.getElementById(\'pdDay\').value.trim() || \'1\';
+  const details = document.getElementById(\'pdDetails\').value.trim();
+  if (!title) {alert(\'Please enter a title.\');return;}
+  const item = document.createElement(\'div\');
+  item.className = \'parl-date-item\';
+  item.innerHTML = \'<button class="pdi-del" onclick="this.closest(\\\'.parl-date-item\\\').remove()">✕ Delete</button><div class="pdi-left"><div class="mo">\'+month+\'</div><div class="dy">\'+day+\'</div></div><div class="pdi-body"><h4 class="editable" contenteditable="\'+adminMode+\'">\'+title+\'</h4><p class="editable" contenteditable="\'+adminMode+\'">\'+details+\'</p></div>\';
+  document.getElementById(\'parlDatesList\').appendChild(item);
+  closeMo(\'moAddParl\');
+}
+
+// ════ FORM CARD ════
+function addFormCard() {
+  const icon = document.getElementById(\'afIcon\').value.trim()||\'📋\';
+  const title = document.getElementById(\'afTitle\').value.trim();
+  const desc = document.getElementById(\'afDesc\').value.trim();
+  const dept = document.getElementById(\'afDept\').value.trim();
+  const time = document.getElementById(\'afTime\').value.trim();
+  if (!title||!desc||!dept) {alert(\'Fill in all required fields.\');return;}
+  const card = document.createElement(\'div\');
+  card.className = \'fc\';
+  card.onclick = () => openForm(\'general\');
+  card.innerHTML = \'<div class="fc-icon">\'+icon+\'</div><h4>\'+title+\'</h4><p>\'+desc+\'</p><div class="fc-meta"><span>\'+dept+\'</span><span class="fc-time">⏱ \'+time+\'</span></div>\';
+  document.getElementById(\'formCards\').appendChild(card);
+  closeMo(\'moAddForm\');
+}
+
+// ════ SUBMISSIONS ════
+function openSubsMo() {
+  const list = document.getElementById(\'subList\');
+  document.getElementById(\'subCount\').textContent = submissions.length + \' submission\' + (submissions.length!==1?\'s\':\'\');
+  list.innerHTML = submissions.length ? submissions.map(s=>\'<div class="sub-item"><div class="sub-ref">\'+s.ref+\'</div><div class="sub-type">\'+s.type+\'</div><div class="sub-date">\'+s.date+\'</div></div>\').join(\'\') : \'<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:14px;">No submissions yet.</div>\';
+  openMo(\'moSubs\');
+}
+document.getElementById(\'moSubs\').querySelector(\'.btn-ghost\') && null;
+// Override openMo for moSubs to load data
+const origOpenMo = openMo;
+function openMo(id) {
+  if (id===\'moSubs\') { openSubsMo(); return; }
+  if (id===\'moEditStats\') { loadStats(); }
+  document.getElementById(id).classList.add(\'open\');
+  document.body.style.overflow=\'hidden\';
+}
+function clearSubs() {if(confirm(\'Clear all?\')) {submissions=[];localStorage.setItem(\'amp_subs\',\'[]\');openSubsMo();}}
+
+// ════ STATS ════
+function loadStats() {
+  document.querySelectorAll(\'[data-si]\').forEach((el,i)=>{ const inp=document.getElementById(\'si\'+i); if(inp)inp.value=el.textContent; });
+}
+function saveStats() {
+  document.querySelectorAll(\'[data-si]\').forEach((el,i)=>{ const inp=document.getElementById(\'si\'+i); if(inp&&inp.value)el.textContent=inp.value; });
+  closeMo(\'moEditStats\');
+}
+
+// ════ EMBASSY ════
+function addEmbassy() {
+  const flag = document.getElementById(\'embFlag\').value.trim()||\'🌍\';
+  const type = document.getElementById(\'embType\').value.trim();
+  const title = document.getElementById(\'embTitle\').value.trim();
+  const addr = document.getElementById(\'embAddr\').value.trim();
+  const tel = document.getElementById(\'embTel\').value.trim();
+  const email = document.getElementById(\'embEmail\').value.trim();
+  if (!title||!addr) {alert(\'Fill in required fields.\');return;}
+  const card = document.createElement(\'div\');
+  card.className = \'emb-card\';
+  card.style.position=\'relative\';
+  card.innerHTML = \'<button class="adm-del" onclick="this.closest(\\\'.emb-card\\\').remove()">✕</button><div class="emb-flag">\'+flag+\'</div><div class="emb-type">\'+type+\'</div><h4 class="editable" contenteditable="\'+adminMode+\'">\'+title+\'</h4><p class="editable" contenteditable="\'+adminMode+\'">\'+addr+\'</p><div class="emb-contact"><strong>Tel:</strong> \'+tel+\' | <strong>Email:</strong> \'+email+\'</div>\';
+  document.getElementById(\'embGrid\').appendChild(card);
+  closeMo(\'moAddEmb\');
+}
+
+// ════ DEPARTMENT DATA ════
+const deptData = {
+  taoiseach:{name:\'Office of the Prime Minister\',sub:\'Executive leadership and national policy\',icon:\'🏛️\',roles:\'The Office of the Prime Minister coordinates government policy, cabinet meetings, and national strategy. It manages relations between government departments and oversees national communications.\',responsibilities:\'Coordinate cabinet and government; national security oversight; political direction; government communications; emergency management coordination.\',hq:\'Government Buildings, Upper Merrion Street, Amplon City\',budget:\'142\',secgen:\'Ms. Aoife Brennan\',deptsec:\'Mr. Ciarán Lynch\',phone:\'0800 100 001\',email:\'pmoffice@gov.amp\'},
+  finance:{name:\'Department of Finance\',sub:\'National fiscal policy and revenue management\',icon:\'💰\',roles:\'The Department of Finance is responsible for the management of the national economy, tax policy, and fiscal affairs of Amplon.\',responsibilities:\'National budget preparation; tax policy and revenue collection; fiscal oversight; government borrowing; economic forecasting.\',hq:\'Merrion Street, Amplon City\',budget:\'280\',secgen:\'Mr. Declan Murphy\',deptsec:\'Ms. Siobhán Walsh\',phone:\'0800 100 002\',email:\'finance@gov.amp\'},
+  health:{name:\'Department of Health\',sub:\'Public health and healthcare services\',icon:\'🏥\',roles:\'The Department of Health is responsible for the health of the people of Amplon, developing and implementing public health policy.\',responsibilities:\'Healthcare regulation; hospital funding and oversight; public health campaigns; disease prevention; medicines regulation.\',hq:\'Hawkins House, Hawkins Street, Amplon City\',budget:\'2,840\',secgen:\'Dr. Máire O\'Brien\',deptsec:\'Mr. Seamus Gallagher\',phone:\'0800 100 003\',email:\'health@gov.amp\'},
+  infrastructure:{name:\'Department of Infrastructure\',sub:\'National infrastructure and development\',icon:\'🛣️\',roles:\'Responsible for planning, developing and maintaining national infrastructure including roads, bridges, public transport, and housing construction.\',responsibilities:\'Roads and bridges; public transport; airports and ports; flood relief; housing construction oversight.\',hq:\'Custom House, Amplon City\',budget:\'1,600\',secgen:\'Mr. Patrick Collins\',deptsec:\'Ms. Niamh Doyle\',phone:\'0800 100 004\',email:\'infrastructure@gov.amp\'},
+  education:{name:\'Department of Education\',sub:\'Schools, universities, and lifelong learning\',icon:\'📚\',roles:\'The Department of Education oversees the educational system from primary through to tertiary level, including teacher training and curriculum development.\',responsibilities:\'Primary and secondary education; teacher training; higher education policy; special education; literacy programs.\',hq:\'Marlborough Street, Amplon City\',budget:\'2,200\',secgen:\'Ms. Fionnuala Keane\',deptsec:\'Mr. Brian Tynan\',phone:\'0800 100 005\',email:\'education@gov.amp\'},
+  environment:{name:\'Department of the Environment\',sub:\'Conservation, climate and sustainability\',icon:\'🌿\',roles:\'Responsible for environmental protection, climate action policy, natural resource management, and environmental regulation across Amplon.\',responsibilities:\'Climate action plan; environmental licensing; biodiversity; waste management; water quality; renewable energy policy.\',hq:\'Dún Scéine, Harcourt Lane, Amplon City\',budget:\'280\',secgen:\'Dr. Caoimhe Ní Fhaoláin\',deptsec:\'Mr. Oisín Sheridan\',phone:\'0800 100 006\',email:\'environment@gov.amp\'},
+  justice:{name:\'Department of Justice\',sub:\'Rule of law, courts, and anti-corruption\',icon:\'⚖️\',roles:\'The Department of Justice is responsible for the administration of justice, law reform, and the maintenance of public order in Amplon.\',responsibilities:\'Courts administration; legal aid; prisons; anti-corruption; Garda oversight; immigration; citizenship.\',hq:\'Bishop\'s Square, Kevin Street, Amplon City\',budget:\'620\',secgen:\'Mr. Fergal Donnelly\',deptsec:\'Ms. Eimear Flood\',phone:\'0800 100 007\',email:\'justice@gov.amp\'},
+  foreign:{name:\'Department of Foreign Affairs\',sub:\'Diplomacy, embassies, and international trade\',icon:\'🌐\',roles:\'Responsible for Amplon\'s international relations, diplomatic missions, and overseas consular services for citizens.\',responsibilities:\'Diplomatic relations; embassy management; international trade agreements; consular services; passport services abroad.\',hq:\'Iveagh House, St Stephen\'s Green, Amplon City\',budget:\'190\',secgen:\'Ms. Áine O\'Sullivan\',deptsec:\'Mr. Rónán Breathnach\',phone:\'0800 100 008\',email:\'foreign@gov.amp\'},
+  transport:{name:\'Department of Transport\',sub:\'Public transit, aviation, rail, and ports\',icon:\'🚌\',roles:\'The Department of Transport is responsible for policy and investment in land, sea, and air transport infrastructure and services.\',responsibilities:\'Road safety; rail and bus services; aviation policy; ports and maritime; cycling and walking infrastructure; driver licensing.\',hq:\'Leeson Lane, Amplon City\',budget:\'480\',secgen:\'Mr. Tadhg Ó\'Callaghan\',deptsec:\'Ms. Roisín Maguire\',phone:\'0800 100 009\',email:\'transport@gov.amp\'},
+  housing:{name:\'Department of Housing\',sub:\'Affordable housing and urban development\',icon:\'🏘️\',roles:\'Responsible for housing policy, planning policy, and built environment in Amplon, including the delivery of affordable housing.\',responsibilities:\'Social and affordable housing; planning legislation; urban regeneration; Traveller accommodation; tenancy regulation.\',hq:\'Custom House, Amplon City\',budget:\'520\',secgen:\'Ms. Clodagh Farrell\',deptsec:\'Mr. Diarmaid Ó Mathúna\',phone:\'0800 100 010\',email:\'housing@gov.amp\'},
+  commerce:{name:\'Department of Commerce\',sub:\'Trade, enterprise, and economic development\',icon:\'💼\',roles:\'The Department of Commerce promotes economic growth through trade, enterprise support, business regulation, and attracting foreign investment.\',responsibilities:\'Trade promotion; business licensing and regulation; investment attraction; SME support; consumer protection; competition policy.\',hq:\'23 Kildare Street, Amplon City\',budget:\'310\',secgen:\'Mr. Conor Egan\',deptsec:\'Ms. Úna McCarthy\',phone:\'0800 100 011\',email:\'commerce@gov.amp\'},
+  social:{name:\'Department of Social Development\',sub:\'Welfare, grants, and community programs\',icon:\'🤝\',roles:\'Responsible for social welfare, income support, disability services, and community development programs across Amplon.\',responsibilities:\'Social grants and welfare; disability services; child protection; community development; elderly care; employment support.\',hq:\'Áras Mhic Dhiarmada, Store Street, Amplon City\',budget:\'1,800\',secgen:\'Ms. Meadhbh Ní Ghráinne\',deptsec:\'Mr. Pádraig Dunne\',phone:\'0800 100 012\',email:\'social@gov.amp\'},
+  defence:{name:\'Department of Defence\',sub:\'National defence and armed forces\',icon:\'🛡️\',roles:\'Responsible for the defence of the state and the management of the Amplon Defence Forces including the Army, Naval Service, and Air Corps.\',responsibilities:\'Armed forces command and control; national security policy; civil defence; military justice; veterans affairs.\',hq:\'Station Road, Newbridge, Amplon\',budget:\'850\',secgen:\'Mr. Liam Ó Treasaigh\',deptsec:\'Ms. Eibhlín Ní Cheallaigh\',phone:\'0800 100 013\',email:\'defence@gov.amp\'},
+  homeaffairs:{name:\'Department of Home Affairs\',sub:\'Identity, immigration, and borders\',icon:\'🛂\',roles:\'The Department of Home Affairs manages passports, national identity, immigration, citizenship, and border security for Amplon.\',responsibilities:\'Passport issuance; national ID cards; immigration and visas; citizenship applications; border security; civil registration.\',hq:\'Burgh Quay, Amplon City\',budget:\'288\',secgen:\'Ms. Sorcha Daly\',deptsec:\'Mr. Brendan Ó\'Flaithearta\',phone:\'0800 100 014\',email:\'homeaffairs@gov.amp\'}
+};
+
+function openDept(key) {
+  const d = deptData[key];
+  if (!d) return;
+  document.getElementById(\'dpTitle\').textContent = d.icon + \' \' + d.name;
+  document.getElementById(\'dpSubtitle\').textContent = d.sub;
+  document.getElementById(\'dpBody\').innerHTML = `
+    <div class="dp-budget-box" style="margin-bottom:20px;">
+      <div class="dp-budget-num editable" contenteditable="${adminMode}" id="dpBudget${key}">A$ ${d.budget}M</div>
+      <div class="dp-budget-lbl">Annual Budget Allocation</div>
+    </div>
+    <div class="dp-section"><h3>📋 Roles & Mandate</h3><p class="dp-editable" contenteditable="${adminMode}">${d.roles}</p></div>
+    <div class="dp-section"><h3>⚙️ Responsibilities</h3><p class="dp-editable" contenteditable="${adminMode}">${d.responsibilities}</p></div>
+    <div class="dp-section"><h3>📍 Headquarters</h3><p class="dp-editable" contenteditable="${adminMode}">${d.hq}</p></div>
+    <div class="dp-section">
+      <h3>👤 Leadership</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="background:var(--off);border-radius:var(--r);padding:12px;"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-light);font-weight:600;margin-bottom:4px;">Secretary General</div><div class="dp-editable" contenteditable="${adminMode}" style="font-weight:600;font-size:14px;">${d.secgen}</div></div>
+        <div style="background:var(--off);border-radius:var(--r);padding:12px;"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-light);font-weight:600;margin-bottom:4px;">Deputy Secretary</div><div class="dp-editable" contenteditable="${adminMode}" style="font-weight:600;font-size:14px;">${d.deptsec}</div></div>
+      </div>
+    </div>
+    <div class="dp-section"><h3>📞 Contact</h3><p style="font-size:14px;"><strong>Phone:</strong> <span class="dp-editable" contenteditable="${adminMode}">${d.phone}</span><br><strong>Email:</strong> <span class="dp-editable" contenteditable="${adminMode}">${d.email}</span></p></div>
+  `;
+  document.getElementById(\'deptPanel\').classList.add(\'open\');
+  document.body.style.overflow = \'hidden\';
+}
+function closeDeptPanel() {
+  document.getElementById(\'deptPanel\').classList.remove(\'open\');
+  document.body.style.overflow = \'\';
+}
+document.getElementById(\'deptPanel\').addEventListener(\'click\', e => { if(e.target===document.getElementById(\'deptPanel\')) closeDeptPanel(); });
+
+// ════ ADD DEPT ════
+function addDept() {
+  const icon = document.getElementById(\'ddIcon\').value.trim()||\'🏛️\';
+  const name = document.getElementById(\'ddName\').value.trim();
+  const desc = document.getElementById(\'ddDesc\').value.trim();
+  const secgen = document.getElementById(\'ddSec\').value.trim();
+  const hq = document.getElementById(\'ddHQ\').value.trim();
+  const budget = document.getElementById(\'ddBudget\').value.trim();
+  if (!name||!desc) {alert(\'Fill required fields.\');return;}
+  const key = \'custom_\' + Date.now();
+  deptData[key] = {name,sub:desc,icon,roles:\'Roles to be added.\',responsibilities:\'Responsibilities to be added.\',hq:hq||\'Address TBD\',budget:budget||\'TBD\',secgen:secgen||\'TBD\',deptsec:\'TBD\',phone:\'TBD\',email:\'TBD\'};
+  const card = document.createElement(\'div\');
+  card.className = \'dept-card\';
+  card.onclick = () => openDept(key);
+  card.innerHTML = \'<div class="dept-icon" style="background:#f0f7f4;">\'+icon+\'</div><h4>\'+name+\'</h4><p>\'+desc+\'</p><div class="dept-view">View Details →</div>\';
+  document.getElementById(\'deptGrid\').appendChild(card);
+  closeMo(\'moAddDept\');
+}
+
+// ════ BUDGET CHARTS ════
+let chartsInit = false;
+function initCharts() {
+  if (chartsInit) return;
+  chartsInit = true;
+  const depts = [\'Health\',\'Education\',\'Infrastructure\',\'Social Dev.\',\'Defence\',\'Justice\',\'Transport\',\'Housing\',\'Commerce\',\'Environment\',\'Finance\',\'Foreign\',\'Home Affairs\',\'PM Office\'];
+  const vals = [2840,2200,1600,1800,850,620,480,520,310,280,280,190,288,142];
+  const colors = [\'#C8102E\',\'#1a3d2b\',\'#FFD100\',\'#e07020\',\'#2060a0\',\'#8b2020\',\'#206060\',\'#605020\',\'#402080\',\'#1a6e3a\',\'#555\',\'#804010\',\'#204080\',\'#802040\'];
+  // National bar chart
+  const nc = document.getElementById(\'chartNational\');
+  if (nc) new Chart(nc, {type:\'bar\',data:{labels:depts,datasets:[{label:\'A$ Million\',data:vals,backgroundColor:colors,borderRadius:4}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}},responsive:true}});
+  // County bar
+  const counties = [\'Kildare\',\'Donegal\',\'Mayo\',\'Kilkenny\',\'Limerick\',\'Wicklow\',\'Wexford\',\'Cork\',\'Galway\'];
+  const countyVals = [118,102,88,74,112,90,94,248,174];
+  const cb = document.getElementById(\'chartCounty\');
+  if (cb) new Chart(cb,{type:\'bar\',data:{labels:counties,datasets:[{label:\'A$ Million\',data:countyVals,backgroundColor:[\'#C8102E\',\'#1a3d2b\',\'#FFD100\',\'#C8102E\',\'#1a3d2b\',\'#FFD100\',\'#C8102E\',\'#1a3d2b\',\'#FFD100\'],borderRadius:4}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}},responsive:true}});
+  // Pie
+  const cp = document.getElementById(\'chartPie\');
+  if (cp) new Chart(cp,{type:\'doughnut\',data:{labels:depts,datasets:[{data:vals,backgroundColor:colors,borderWidth:1}]},options:{plugins:{legend:{position:\'right\',labels:{font:{size:10},boxWidth:12}}},responsive:true}});
+  // County bar2
+  const cb2 = document.getElementById(\'chartBar2\');
+  if (cb2) new Chart(cb2,{type:\'bar\',data:{labels:counties,datasets:[{label:\'A$ Million\',data:countyVals,backgroundColor:\'#1a3d2b\',borderRadius:4}]},options:{plugins:{legend:{display:false}},indexAxis:\'y\',scales:{x:{beginAtZero:true}},responsive:true}});
+  // Growth
+  const cg = document.getElementById(\'chartGrowth\');
+  if (cg) new Chart(cg,{type:\'bar\',data:{labels:depts,datasets:[{label:\'% Change\',data:[2.1,0.5,8.2,5.1,12.0,6.3,1.2,3.8,7.5,15.0,4.0,18.0,0.8,3.0],backgroundColor:vals.map((_,i)=>[2.1,0.5,8.2,5.1,12.0,6.3,1.2,3.8,7.5,15.0,4.0,18.0,0.8,3.0][i]>=0?\'#1a3d2b\':\'#C8102E\'),borderRadius:4}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>v+\'%\'}}},responsive:true}});
+}
+function showBudget(id, btn) {
+  document.querySelectorAll(\'.budget-panel\').forEach(p=>p.classList.remove(\'active\'));
+  document.querySelectorAll(\'.btab\').forEach(b=>b.classList.remove(\'active\'));
+  document.getElementById(\'bp-\'+id).classList.add(\'active\');
+  btn.classList.add(\'active\');
+}
+
+// ════ LOCAL GOVERNMENT ════
+const countyData = {
+  kildare:{name:\'County Kildare\',em:\'🏴\',mayor:\'Cathaoirleach: Cllr. Mary Boland\',pop:\'222,500\',area:\'1,693 km²\',hq:\'Áras Chill Dara, Devoy Park, Naas\',phone:\'045 980 200\',email:\'info@kildarecoco.ie\',desc:\'Kildare is known for its rolling plains, horse racing heritage, and proximity to the capital. It is one of Amplon\'s fastest-growing counties.\'},
+  donegal:{name:\'County Donegal\',em:\'🏔️\',mayor:\'Cathaoirleach: Cllr. Seán Ó Dochartaigh\',pop:\'168,000\',area:\'4,861 km²\',hq:\'County House, The Diamond, Lifford\',phone:\'074 916 4900\',email:\'info@donegalcoco.ie\',desc:\'Donegal is the most northerly county of Amplon, known for stunning coastline, Irish language culture, and outdoor tourism.\'},
+  mayo:{name:\'County Mayo\',em:\'🌊\',mayor:\'Cathaoirleach: Cllr. Anne Ruddy\',pop:\'130,000\',area:\'5,586 km²\',hq:\'Áras an Chontae, Castlebar\',phone:\'094 902 4444\',email:\'info@mayococo.ie\',desc:\'Mayo is a largely rural county on the western seaboard, famous for Croagh Patrick, Clew Bay, and its rich archaeological heritage.\'},
+  kilkenny:{name:\'County Kilkenny\',em:\'⚫\',mayor:\'Cathaoirleach: Cllr. David Fitzgerald\',pop:\'99,000\',area:\'2,062 km²\',hq:\'County Hall, John Street, Kilkenny\',phone:\'056 779 4000\',email:\'info@kilkennycoco.ie\',desc:\'Kilkenny is a historic county with a rich heritage of crafts, arts, and hurling. Kilkenny City is one of Amplon\'s best-preserved medieval cities.\'},
+  limerick:{name:\'County Limerick\',em:\'🏙️\',mayor:\'Cathaoirleach: Cllr. Sarah Mulcahy\',pop:\'194,000\',area:\'2,756 km²\',hq:\'Merchants Quay, Limerick City\',phone:\'061 556 000\',email:\'info@limerick.ie\',desc:\'Limerick is a major urban centre of Amplon, undergoing significant regeneration. It is home to the University of Amplon and a growing tech sector.\'},
+  wicklow:{name:\'County Wicklow\',em:\'🌲\',mayor:\'Cathaoirleach: Cllr. Jennifer Doyle\',pop:\'142,000\',area:\'2,025 km²\',hq:\'County Buildings, Wicklow Town\',phone:\'0404 20100\',email:\'info@wicklowcoco.ie\',desc:\'Known as the Garden of Amplon, Wicklow features dramatic mountains, golden beaches, and ancient monastic settlements at Glendalough.\'},
+  wexford:{name:\'County Wexford\',em:\'☀️\',mayor:\'Cathaoirleach: Cllr. Paul Kehoe\',pop:\'149,000\',area:\'2,365 km²\',hq:\'County Hall, Spawell Road, Wexford\',phone:\'053 919 6000\',email:\'info@wexfordcoco.ie\',desc:\'Wexford is a sunny southeastern county with a strong agricultural base, Viking heritage, and vibrant arts and opera culture.\'},
+  cork:{name:\'County Cork\',em:\'🔴\',mayor:\'Cathaoirleach: Cllr. Liam Burke\',pop:\'542,000\',area:\'7,500 km²\',hq:\'County Hall, Carrigrohane Road, Cork\',phone:\'021 434 6100\',email:\'info@corkcoco.ie\',desc:\'Cork is Amplon\'s largest county and second city. It is a major centre for industry, pharmaceuticals, technology, and maritime trade.\'},
+  galway:{name:\'County Galway\',em:\'🌅\',mayor:\'Cathaoirleach: Cllr. Martina Ni Fhatharta\',pop:\'258,000\',area:\'6,149 km²\',hq:\'County Buildings, Prospect Hill, Galway\',phone:\'091 509 000\',email:\'info@galwaycoco.ie\',desc:\'Galway is a vibrant cultural and university city county on Amplon\'s west coast. It is the heart of Irish-speaking Amplon and a global tourism destination.\'}
+};
+function buildCountyPanels() {
+  const container = document.getElementById(\'countyPanels\');
+  Object.entries(countyData).forEach(([key, d], i) => {
+    const panel = document.createElement(\'div\');
+    panel.className = \'county-panel\' + (i===0?\' active\':\'\');
+    panel.id = \'cp-\' + key;
+    panel.innerHTML = `
+      <div class="county-header">
+        <div><h2>${d.em} ${d.name}</h2><p class="editable" contenteditable="false">${d.mayor}</p></div>
+        <div class="county-seal" style="font-size:28px;">${d.em}</div>
+      </div>
+      <div class="county-grid">
+        <div class="card">
+          <h3 style="font-family:var(--font-serif);color:var(--green);font-size:16px;margin-bottom:10px;">ℹ️ About ${d.name}</h3>
+          <p style="font-size:13px;color:var(--text-muted);line-height:1.7;" class="editable" contenteditable="false">${d.desc}</p>
+          <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="background:var(--off);border-radius:var(--r);padding:8px;"><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.06em;">Population</div><div style="font-weight:700;font-size:15px;color:var(--green);" class="editable" contenteditable="false">${d.pop}</div></div>
+            <div style="background:var(--off);border-radius:var(--r);padding:8px;"><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.06em;">Area</div><div style="font-weight:700;font-size:15px;color:var(--green);" class="editable" contenteditable="false">${d.area}</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="font-family:var(--font-serif);color:var(--green);font-size:16px;margin-bottom:10px;">📞 Contact &amp; Offices</h3>
+          <p style="font-size:13px;line-height:1.8;" class="editable" contenteditable="false"><strong>HQ:</strong> ${d.hq}<br><strong>Phone:</strong> ${d.phone}<br><strong>Email:</strong> ${d.email}</p>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <h3 style="font-family:var(--font-serif);color:var(--green);font-size:16px;">📅 Important County Dates</h3>
+          <button class="adm-add" onclick="openAddCountyDate('${key}')">＋ Add Date</button>
+        </div>
+        <div class="county-dates-list" id="cdl-${key}">
+          <div class="county-date-item"><div class="cdi-dot"></div><div><strong style="font-size:13px;">Annual Budget Meeting</strong><br><span style="font-size:12px;color:var(--text-muted);">January 2025 — County Council Chamber</span></div><button class="cdi-del" onclick="this.closest('.county-date-item').remove()">✕ Delete</button></div>
+          <div class="county-date-item"><div class="cdi-dot"></div><div><strong style="font-size:13px;">Local Area Plan Review</strong><br><span style="font-size:12px;color:var(--text-muted);">March 2025 — Planning Office</span></div><button class="cdi-del" onclick="this.closest('.county-date-item').remove()">✕ Delete</button></div>
+        </div>
+      </div>
+    `;
+    container.appendChild(panel);
+  });
+}
+function showCounty(key, btn) {
+  document.querySelectorAll(\'.county-panel\').forEach(p=>p.classList.remove(\'active\'));
+  document.querySelectorAll(\'.ctab\').forEach(b=>b.classList.remove(\'active\'));
+  document.getElementById(\'cp-\'+key).classList.add(\'active\');
+  btn.classList.add(\'active\');
+}
+function openAddCountyDate(county) {
+  document.getElementById(\'cdCounty\').value = county;
+  document.getElementById(\'moCountyDateLbl\').textContent = \'Adding date for: \' + countyData[county].name;
+  openMo(\'moAddCountyDate\');
+}
+function addCountyDate() {
+  const county = document.getElementById(\'cdCounty\').value;
+  const date = document.getElementById(\'cdDate\').value;
+  const title = document.getElementById(\'cdTitle\').value.trim();
+  const cat = document.getElementById(\'cdCat\').value;
+  const details = document.getElementById(\'cdDetails\').value.trim();
+  if (!title) {alert(\'Enter a title.\');return;}
+  const item = document.createElement(\'div\');
+  item.className = \'county-date-item\';
+  const dateStr = date ? new Date(date).toLocaleDateString(\'en-GB\',{day:\'numeric\',month:\'long\',year:\'numeric\'}) : \'Date TBD\';
+  item.innerHTML = \'<div class="cdi-dot"></div><div><strong style="font-size:13px;">\'+title+\' <span style="font-size:10px;color:var(--red);font-weight:700;text-transform:uppercase;background:var(--red-light);padding:1px 6px;border-radius:10px;">\'+cat+\'</span></strong><br><span style="font-size:12px;color:var(--text-muted);">\'+dateStr+(details?\' — \'+details:\'\')+\'</span></div><button class="cdi-del" onclick="this.closest(\\\'.county-date-item\\\').remove()">✕ Delete</button>\';
+  document.getElementById(\'cdl-\'+county).appendChild(item);
+  closeMo(\'moAddCountyDate\');
+}
+
+// ════ ORG CHART ════
+function buildOrgChart() {
+  const container = document.getElementById(\'orgChart\');
+  container.innerHTML = `
+  <div style="display:flex;flex-direction:column;align-items:center;gap:0;font-family:var(--font-sans);">
+    <!-- STRIKER -->
+    <div class="org-box striker" style="margin-bottom:0;"><div class="org-title">The Striker</div><div class="org-name editable" contenteditable="false">[Name of Striker]</div><div class="org-dept">Head of State — Republic of Amplon</div></div>
+    <div style="width:2px;height:28px;background:var(--border);"></div>
+    <!-- PM -->
+    <div class="org-box pm" style="margin-bottom:0;"><div class="org-title">Prime Minister</div><div class="org-name editable" contenteditable="false">[Prime Minister Name]</div><div class="org-dept">Head of Government</div></div>
+    <div style="width:2px;height:28px;background:var(--border);"></div>
+    <!-- CONNECTOR LINE ACROSS -->
+    <div style="display:flex;align-items:flex-start;gap:0;position:relative;width:100%;">
+      <div style="position:absolute;top:0;left:7%;right:7%;height:2px;background:var(--border);"></div>
+      ${buildDeptNodes()}
+    </div>
+  </div>`;
+}
+function buildDeptNodes() {
+  const depts = [
+    {key:\'taoiseach\',label:\'PM\'s Office\'},
+    {key:\'finance\',label:\'Finance\'},
+    {key:\'health\',label:\'Health\'},
+    {key:\'infrastructure\',label:\'Infrastructure\'},
+    {key:\'education\',label:\'Education\'},
+    {key:\'justice\',label:\'Justice\'},
+    {key:\'foreign\',label:\'Foreign Affairs\'},
+    {key:\'social\',label:\'Social Dev.\'},
+    {key:\'transport\',label:\'Transport\'},
+    {key:\'housing\',label:\'Housing\'},
+    {key:\'commerce\',label:\'Commerce\'},
+    {key:\'environment\',label:\'Environment\'},
+    {key:\'defence\',label:\'Defence\'},
+    {key:\'homeaffairs\',label:\'Home Affairs\'}
+  ];
+  return depts.map(d => `
+    <div style="display:flex;flex-direction:column;align-items:center;flex:1;padding-top:0;">
+      <div style="width:2px;height:28px;background:var(--border);"></div>
+      <div class="org-box dept-head" style="min-width:120px;max-width:150px;cursor:pointer;" onclick="openDept(\'${d.key}\')">
+        <div class="org-title">Sec. General</div>
+        <div class="org-name editable" contenteditable="false" style="font-size:12px;">${deptData[d.key].secgen}</div>
+        <div class="org-dept" style="font-size:10px;">${d.label}</div>
+      </div>
+      <div style="width:2px;height:20px;background:var(--border);"></div>
+      <div class="org-box deputy" style="min-width:110px;max-width:140px;">
+        <div class="org-title" style="font-size:9px;">Deputy Secretary</div>
+        <div class="org-name editable" contenteditable="false" style="font-size:11px;">${deptData[d.key].deptsec}</div>
+      </div>
+    </div>`).join(\'\');
+}
+
+// ════ MAP ════
+function loadMap(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = document.getElementById(\'mapImg\');
+    img.src = ev.target.result;
+    img.style.display = \'block\';
+    document.getElementById(\'mapPlaceholder\').style.display = \'none\';
+    document.getElementById(\'mapDrop\').classList.add(\'has-image\');
+  };
+  reader.readAsDataURL(file);
+}
+function clearMap() {
+  document.getElementById(\'mapImg\').src = \'\';
+  document.getElementById(\'mapImg\').style.display = \'none\';
+  document.getElementById(\'mapPlaceholder\').style.display = \'block\';
+  document.getElementById(\'mapDrop\').classList.remove(\'has-image\');
+}
+
+// ════ HOME PREVIEW ════
+function buildHomePreview() {
+  const cards = document.querySelectorAll(\'#annList .ann-card:not(.ann-add-ph)\');
+  const preview = document.getElementById(\'homeAnnPreview\');
+  if (!preview) return;
+  preview.innerHTML = \'\';
+  Array.from(cards).slice(0,3).forEach(card => {
+    const h4 = card.querySelector(\'h4\');
+    const p = card.querySelector(\'p\');
+    const tag = card.querySelector(\'.ann-tag\');
+    const date = card.querySelector(\'.ann-date\');
+    if (!h4) return;
+    const mini = document.createElement(\'div\');
+    mini.className = \'card\';
+    mini.style.cssText = \'cursor:pointer;transition:all .2s;\';
+    mini.onclick = () => showPage(\'announcements\');
+    mini.innerHTML = \'<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">\' + (tag?\'<span class="ann-tag \' + tag.className.replace(\'ann-tag \',\'\')+\'">\'+tag.textContent+\'</span>\':\'\') + (date?\'<span style="font-size:12px;color:var(--text-muted);">\'+date.querySelector(\'.mo\').textContent+\' \'+date.querySelector(\'.dy\').textContent+\'</span>\':\'\') + \'</div><h4 style="font-family:var(--font-serif);font-size:15px;color:var(--green);margin-bottom:6px;">\'+h4.textContent+\'</h4><p style="font-size:12px;color:var(--text-muted);line-height:1.6;">\'+( p?p.textContent.slice(0,120)+\'…\':\'\')+\'</p>\';
+    preview.appendChild(mini);
+  });
+}
+
+// ════ INIT ════
+document.addEventListener(\'DOMContentLoaded\', () => {
+  buildCountyPanels();
+  buildOrgChart();
+  buildHomePreview();
+});
+</script>
+</body>
+</html>'''
+
+# Insert logo
+logo_uri = open('/tmp/logo_uri.txt').read().strip()
+html = html.replace('LOGO_PLACEHOLDER', logo_uri, 1)
+html = html.replace('"LOGO_DATA_URI"', '"' + logo_uri + '"', 1)
+
+with open('/tmp/amplon_portal.html', 'w') as f:
+    f.write(html)
+
+print(f"Written: {len(html)} chars")
+PYEOF
